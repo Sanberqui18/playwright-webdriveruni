@@ -35,10 +35,10 @@ test.describe("Click Buttons - Only Path", () => {
     const clickBoxes = clickBttnPage.locator(".thumbnail");
 
     // Verify each section title and content QTY= 3 are correct
-    for (let key in titles) {
-      let clickBox = clickBoxes.nth(parseInt(key));
-      let textList = clickBox.locator(".section-title > ol > li");
-      let buttonText = clickBox.locator(".caption > span");
+    for (const key in titles) {
+      const clickBox = clickBoxes.nth(parseInt(key));
+      const textList = clickBox.locator(".section-title > ol > li");
+      const buttonText = clickBox.locator(".caption > span");
 
       await expect(clickBox).toContainText(titles[parseInt(key)]);
       await expect(textList).toHaveCount(3);
@@ -70,7 +70,7 @@ test.describe("Click Buttons - Only Path", () => {
     const modal = clickBttnPage.locator(".modal-content");
     const modalTitle = modal.locator(".modal-header > h4");
     const modalContent = modal.locator(".modal-body");
-    const closeBttn = modal.getByRole("button", { name: "Close" });
+    // const closeBttn = modal.getByRole("button", { name: "Close" });
 
     // Define expected texts
     const expectedModalTxts = [
@@ -93,13 +93,16 @@ test.describe("Click Buttons - Only Path", () => {
     ];
 
     // Click on Buttons and verify modal texts
-    for (let [key, modalValue] of expectedModalTxts.entries()) {
+    for (const [key, modalValue] of expectedModalTxts.entries()) {
+      // eslint-disable-next-line playwright/no-force-option
       await buttons[key].click({ force: true });
       await expect(modalTitle.nth(key)).toHaveText(modalValue.title);
       await expect(modalContent.nth(key)).toContainText(modalValue.body);
 
+      // eslint-disable-next-line playwright/no-conditional-in-test
       if (modalValue.list) {
         const modalList = modalContent.locator("ul > li");
+        // eslint-disable-next-line playwright/no-conditional-expect
         await expect(modalList).toHaveText(modalValue.items as string[]);
       }
     }
