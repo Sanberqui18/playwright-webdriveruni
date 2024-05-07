@@ -5,7 +5,7 @@ test.describe("Login Portal Tests - Happy Path", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
   });
-  test("Log in with valid credentials should show an alert success message ", async ({
+  test("Log in with valid credentials should show an alert success message", async ({
     page
   }) => {
     // Navigate to the Login Portal page in a separate Tab
@@ -15,7 +15,7 @@ test.describe("Login Portal Tests - Happy Path", () => {
     await loginPage.waitForLoadState();
 
     // Verify page URL to contain the login portal
-    expect(loginPage).toHaveURL(/login-portal/i);
+    await expect(loginPage).toHaveURL(/login-portal/i);
 
     // Define username password and button fields
     const usernameField = loginPage.getByPlaceholder("Username");
