@@ -26,7 +26,7 @@ test.describe("Contact Use Tests - Happy Path", () => {
     await contactPage.waitForLoadState();
 
     // Verify page URL to contain the contact us
-    expect(contactPage).toHaveURL(/contact-us/i);
+    await expect(contactPage).toHaveURL(/contact-us/i);
 
     //Set Values for Input fields
     const firstNameField = contactPage.getByPlaceholder("First Name");
@@ -47,7 +47,7 @@ test.describe("Contact Use Tests - Happy Path", () => {
     await submitBttn.click();
 
     //Verify page redirection
-    expect(contactPage).toHaveURL(/contact-form-thank-you/);
+    await expect(contactPage).toHaveURL(/contact-form-thank-you/);
 
     // Verify Success message form
     const successMessage = contactPage.getByRole("heading", {

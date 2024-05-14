@@ -61,7 +61,7 @@ test.describe("Home Page Tests - Only Path", () => {
     const homeLinks = page.locator("p > a");
     await expect(homeLinks).toHaveCount(9);
 
-    for (let [key, value] of titlesAndURLs.entries()) {
+    for (const [key, value] of titlesAndURLs.entries()) {
       const linkTitles = await homeLinks.allInnerTexts();
 
       expect(linkTitles[key]).toBe(value.title);
