@@ -86,7 +86,6 @@ test.describe("Page Object Model - Only path", () => {
         const imageSlide = imageSlides.nth(imageIndex);
         const imageDot = imageSelection.nth(imageIndex);
 
-        console.log(imageIndex);
         // Inital state verify the other selections are not active
         if (imageIndex == 0) {
           await expect(imageSlides.nth(imageIndex + 1)).not.toHaveClass(
