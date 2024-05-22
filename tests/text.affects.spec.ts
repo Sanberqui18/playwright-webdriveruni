@@ -7,7 +7,7 @@ test.describe("Text Effects - Only path", () => {
   });
 
   test("Verify page header, titles and button texts", async ({ page }) => {
-    // Navigate to theText Effects page in a separate Tab
+    // Navigate to the Text Affects page in a separate Tab
     const [textAffectsPage] = await Promise.all([
       page.waitForEvent("popup"),
       page
@@ -54,7 +54,7 @@ test.describe("Text Effects - Only path", () => {
   test("Verify button texts are initially hidden and show when clicking on them", async ({
     page
   }) => {
-    // Navigate to theText Effects page in a separate Tab
+    // Navigate to the Text Affects page in a separate Tab
     const [textAffectsPage] = await Promise.all([
       page.waitForEvent("popup"),
       page
@@ -115,7 +115,7 @@ test.describe("Text Effects - Only path", () => {
   });
 
   test("Verify asyncronous actions generated in page", async ({ page }) => {
-    // Navigate to theText Effects page in a separate Tab
+    // Navigate to the Text Affects page in a separate Tab
     const [textAffectsPage] = await Promise.all([
       page.waitForEvent("popup"),
       page
