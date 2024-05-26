@@ -45,7 +45,7 @@ test.describe("Text Effects - Only path", () => {
     await expect(buttons).toHaveText(buttonTexts);
 
     // Verify footer text exists and is visible
-    const footerText = page.getByRole("paragraph").last();
+    const footerText = textAffectsPage.getByRole("paragraph").last();
 
     await expect(footerText).toContainText("Copyright");
     await expect(footerText).toBeVisible();
