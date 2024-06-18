@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "pw-ui": "npx playwright test --ui"
+    "pretest": "rm -rf playwright-report test-results",
+    "pw-ui": "npx playwright test --ui",
+    "pw-regression": " npx playwright test --workers=8 --retries=3"
   },
   "keywords": [],
   "author": "Santiago Bernal",
