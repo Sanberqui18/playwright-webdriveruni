@@ -1,3 +1,5 @@
+/* eslint-disable playwright/no-conditional-expect */
+/* eslint-disable playwright/no-conditional-in-test */
 import { test, expect } from "@playwright/test";
 import { faker } from "@faker-js/faker";
 
@@ -63,9 +65,6 @@ test.describe("Iframe - Only Path", () => {
         const iFrame = iframePage.frameLocator("#frame");
 
         // Define all menu tab sections
-        const homeTab = iFrame.getByRole("link", {
-          name: "Home"
-        });
         const productsTab = iFrame.getByRole("link", {
           name: "Our Products"
         });
@@ -412,7 +411,7 @@ test.describe("Iframe - Only Path", () => {
       await productsTab.click();
 
       // Verify initial state
-      await expect(homeSection).not.toBeVisible();
+      await expect(homeSection).toBeHidden();
       await expect(productSection).toBeAttached();
       await expect(contactTitle).not.toBeAttached();
 
