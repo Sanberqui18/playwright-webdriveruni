@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Autocomoplete Text - Only Path", () => {
+test.describe("Autocomplete Text - Only Path", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
   });
@@ -23,6 +23,7 @@ test.describe("Autocomoplete Text - Only Path", () => {
     );
 
     // Define section items
+    const headerTitle = autocompletepage.getByRole("navigation");
     const title = autocompletepage.getByRole("heading", {
       name: "Autocomplete TextField"
     });
@@ -32,12 +33,15 @@ test.describe("Autocomoplete Text - Only Path", () => {
     const searchfield = autocompletepage.getByRole("textbox");
     const submitBttn = autocompletepage.getByRole("button", { name: "Submit" });
 
-    // Verify items are visible
+    // Verify items are visible and texts are correct
     await expect(title).toBeVisible();
     await expect(searchfield).toBeVisible();
     await expect(searchfield).toHaveAttribute("placeholder", "Food Item");
     await expect(submitBttn).toBeVisible();
     await expect(footer).toBeVisible();
+
+    await expect(headerTitle).toContainText(/WebdriverUniversity/);
+    await expect(footer).toContainText("Copyright");
 
     // Verify list search is initially hidden
     const resultList = autocompletepage.locator("#myInputautocomplete-list");
