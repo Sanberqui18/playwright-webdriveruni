@@ -2,6 +2,7 @@
 /* eslint-disable playwright/no-conditional-in-test */
 import { test, expect } from "@playwright/test";
 import { faker } from "@faker-js/faker";
+import { HomePage } from "../pages/home.page";
 
 test.describe("Iframe - Only Path", () => {
   test.beforeEach(async ({ page }) => {
@@ -10,146 +11,75 @@ test.describe("Iframe - Only Path", () => {
 
   test.describe("IFrame Page", () => {
     test("Verify URL, frame existance and footer", async ({ page }) => {
-      // Navigate to the IFrame Page page in a separate Tab
-      const [iframePage] = await Promise.all([
-        page.waitForEvent("popup"),
-        page
-          .getByRole("link")
-          .filter({ hasText: /IFRAME/ })
-          .click()
-      ]);
-
-      await iframePage.waitForLoadState();
+      const homePage = new HomePage(page);
+      const iframePage = await homePage.openIFrame();
 
       // Verify page URL
-      await expect(iframePage).toHaveURL(/IFrame/i);
-
-      // Define elements
-      const headerTitle = iframePage.getByRole("navigation");
-      const footer = iframePage.getByRole("paragraph").last();
-
-      // Define iFrame elements
-      const iFrame = iframePage.frameLocator("#frame");
-      const iFrameBody = iFrame.locator("body");
+      await expect(iframePage.page).toHaveURL(/IFrame/i);
 
       // Verify element values
-      await expect(headerTitle).toContainText(/WebdriverUniversity.com/);
-      await expect(footer).toContainText("Copyright");
+      await expect(iframePage.outerNavTitle).toContainText(/WebdriverUniversity.com/);
+      await expect(iframePage.outerFooter).toContainText("Copyright");
 
       //Verify Iframe Exists
-      await expect(iFrameBody).toBeAttached();
-      await expect(iFrameBody).toBeVisible();
-      await expect(iFrameBody).toBeInViewport();
+      await expect(iframePage.frameBody).toBeAttached();
+      await expect(iframePage.frameBody).toBeVisible();
+      await expect(iframePage.frameBody).toBeInViewport();
     });
 
-    test.describe("IFrame -Home", () => {
+    test.describe("IFrame - Home", () => {
       test.use({
         viewport: {
           width: 1600,
           height: 850
         }
       });
+
       test("Verify Section Navigation", async ({ page }) => {
-        // Navigate to the IFrame Page page in a separate Tab
-        const [iframePage] = await Promise.all([
-          page.waitForEvent("popup"),
-          page
-            .getByRole("link")
-            .filter({ hasText: /IFRAME/ })
-            .click()
-        ]);
-
-        await iframePage.waitForLoadState();
-
-        // Define iFrame elements
-        const iFrame = iframePage.frameLocator("#frame");
-
-        // Define all menu tab sections
-        const productsTab = iFrame.getByRole("link", {
-          name: "Our Products"
-        });
-        const contactTab = iFrame.getByRole("link", {
-          name: "Contact Us"
-        });
-
-        // Define each tab elements
-        const homeSection = iFrame
-          .getByRole("paragraph")
-          .filter({ hasText: "Who Are We?" });
-        const productSection = iFrame.getByRole("link", {
-          name: "Special Offers"
-        });
-        const contactTitle = iFrame.getByRole("heading", {
-          name: "CONTACT US"
-        });
+        const homePage = new HomePage(page);
+        const iframePage = await homePage.openIFrame();
 
         // Verify initial state
-        await expect(homeSection).toBeVisible();
-        await expect(productSection).not.toBeAttached();
-        await expect(contactTitle).not.toBeAttached();
+        await expect(iframePage.homeSection).toBeVisible();
+        await expect(iframePage.productSection).not.toBeAttached();
+        await expect(iframePage.contactTitle).not.toBeAttached();
 
         // Validate Product Navigation
-        await productsTab.click();
+        await iframePage.productsTab.click();
 
-        await expect(homeSection).not.toBeAttached();
-        await expect(productSection).toBeVisible();
-        await expect(contactTitle).not.toBeAttached();
+        await expect(iframePage.homeSection).not.toBeAttached();
+        await expect(iframePage.productSection).toBeVisible();
+        await expect(iframePage.contactTitle).not.toBeAttached();
 
         // Validate Contact Us Navigation
-        await contactTab.click();
+        await iframePage.contactTab.click();
 
-        await expect(homeSection).not.toBeAttached();
-        await expect(productSection).not.toBeAttached();
-        await expect(contactTitle).toBeVisible();
+        await expect(iframePage.homeSection).not.toBeAttached();
+        await expect(iframePage.productSection).not.toBeAttached();
+        await expect(iframePage.contactTitle).toBeVisible();
       });
 
       test("Image Container list should work correctly", async ({ page }) => {
-        // Navigate to the IFrame Page page in a separate Tab
-        const [iframePage] = await Promise.all([
-          page.waitForEvent("popup"),
-          page
-            .getByRole("link")
-            .filter({ hasText: /IFRAME/ })
-            .click()
-        ]);
-
-        await iframePage.waitForLoadState();
-
-        // Define iFrame elements
-        const iFrame = iframePage.frameLocator("#frame");
-
-        // Define image elements
-        const imageSlides = iFrame.locator(".item");
-        const imageSelection = iFrame
-          .getByRole("list")
-          .nth(0)
-          .getByRole("listitem");
+        const homePage = new HomePage(page);
+        const iframePage = await homePage.openIFrame();
 
         // Verify Image Slides and Selection count
-        await expect(imageSlides).toHaveCount(3);
-        await expect(imageSelection).toHaveCount(3);
+        await expect(iframePage.imageSlides).toHaveCount(3);
+        await expect(iframePage.imageDots).toHaveCount(3);
 
-        const imageCount = (await imageSlides.count()) - 1;
+        const imageCount = (await iframePage.imageSlides.count()) - 1;
 
         // Verify image selection and slides when clicking on all options
         for (let imageIndex = 0; imageIndex <= imageCount; imageIndex++) {
-          const imageSlide = imageSlides.nth(imageIndex);
-          const imageDot = imageSelection.nth(imageIndex);
+          const imageSlide = iframePage.imageSlides.nth(imageIndex);
+          const imageDot = iframePage.imageDots.nth(imageIndex);
 
           // Inital state verify the other selections are not active
           if (imageIndex == 0) {
-            await expect(imageSlides.nth(imageIndex + 1)).not.toHaveClass(
-              "active"
-            );
-            await expect(imageSelection.nth(imageIndex + 1)).not.toHaveClass(
-              "active"
-            );
-            await expect(imageSlides.nth(imageIndex + 2)).not.toHaveClass(
-              "active"
-            );
-            await expect(imageSelection.nth(imageIndex + 2)).not.toHaveClass(
-              "active"
-            );
+            await expect(iframePage.imageSlides.nth(imageIndex + 1)).not.toHaveClass("active");
+            await expect(iframePage.imageDots.nth(imageIndex + 1)).not.toHaveClass("active");
+            await expect(iframePage.imageSlides.nth(imageIndex + 2)).not.toHaveClass("active");
+            await expect(iframePage.imageDots.nth(imageIndex + 2)).not.toHaveClass("active");
           }
           // Chose selection
           await imageDot.click();
@@ -163,69 +93,41 @@ test.describe("Iframe - Only Path", () => {
       test("Image Container buttons should work correctly", async ({
         page
       }) => {
-        // Navigate to the IFrame Page page in a separate Tab
-        const [iframePage] = await Promise.all([
-          page.waitForEvent("popup"),
-          page
-            .getByRole("link")
-            .filter({ hasText: /IFRAME/ })
-            .click()
-        ]);
+        const homePage = new HomePage(page);
+        const iframePage = await homePage.openIFrame();
 
-        await iframePage.waitForLoadState();
+        await expect(iframePage.imageSlides).toHaveCount(3);
 
-        // Define iFrame elements
-        const iFrame = iframePage.frameLocator("#frame");
+        await expect(iframePage.imageSlides.nth(0)).toHaveClass("item active");
+        await expect(iframePage.imageSlides.nth(1)).not.toHaveClass("item active");
+        await expect(iframePage.imageSlides.nth(2)).not.toHaveClass("item active");
 
-        const imageSlides = iFrame.locator(".item");
-        const leftBttn = iFrame.getByRole("link", { name: "" });
-        const rightBttn = iFrame.getByRole("link", {
-          name: ""
-        });
+        await iframePage.carouselRight.click();
+        await expect(iframePage.imageSlides.nth(0)).not.toHaveClass("item active");
+        await expect(iframePage.imageSlides.nth(1)).toHaveClass("item active");
+        await expect(iframePage.imageSlides.nth(2)).not.toHaveClass("item active");
 
-        await expect(imageSlides).toHaveCount(3);
+        await iframePage.carouselRight.click();
+        await expect(iframePage.imageSlides.nth(0)).not.toHaveClass("item active");
+        await expect(iframePage.imageSlides.nth(1)).not.toHaveClass("item active");
+        await expect(iframePage.imageSlides.nth(2)).toHaveClass("item active");
 
-        await expect(imageSlides.nth(0)).toHaveClass("item active");
-        await expect(imageSlides.nth(1)).not.toHaveClass("item active");
-        await expect(imageSlides.nth(2)).not.toHaveClass("item active");
+        await iframePage.carouselLeft.click();
+        await expect(iframePage.imageSlides.nth(0)).not.toHaveClass("item active");
+        await expect(iframePage.imageSlides.nth(1)).toHaveClass("item active");
+        await expect(iframePage.imageSlides.nth(2)).not.toHaveClass("item active");
 
-        await rightBttn.click();
-        await expect(imageSlides.nth(0)).not.toHaveClass("item active");
-        await expect(imageSlides.nth(1)).toHaveClass("item active");
-        await expect(imageSlides.nth(2)).not.toHaveClass("item active");
-
-        await rightBttn.click();
-        await expect(imageSlides.nth(0)).not.toHaveClass("item active");
-        await expect(imageSlides.nth(1)).not.toHaveClass("item active");
-        await expect(imageSlides.nth(2)).toHaveClass("item active");
-
-        await leftBttn.click();
-        await expect(imageSlides.nth(0)).not.toHaveClass("item active");
-        await expect(imageSlides.nth(1)).toHaveClass("item active");
-        await expect(imageSlides.nth(2)).not.toHaveClass("item active");
-
-        await leftBttn.click();
-        await expect(imageSlides.nth(0)).toHaveClass("item active");
-        await expect(imageSlides.nth(1)).not.toHaveClass("item active");
-        await expect(imageSlides.nth(2)).not.toHaveClass("item active");
+        await iframePage.carouselLeft.click();
+        await expect(iframePage.imageSlides.nth(0)).toHaveClass("item active");
+        await expect(iframePage.imageSlides.nth(1)).not.toHaveClass("item active");
+        await expect(iframePage.imageSlides.nth(2)).not.toHaveClass("item active");
       });
 
       test("Verify Section Qty, titles, stars, buttons and texts", async ({
         page
       }) => {
-        // Navigate to the IFrame Page page in a separate Tab
-        const [iframePage] = await Promise.all([
-          page.waitForEvent("popup"),
-          page
-            .getByRole("link")
-            .filter({ hasText: /IFRAME/ })
-            .click()
-        ]);
-
-        await iframePage.waitForLoadState();
-
-        // Define iFrame elements
-        const iFrame = iframePage.frameLocator("#frame");
+        const homePage = new HomePage(page);
+        const iframePage = await homePage.openIFrame();
 
         // Define menu values
         const menuValues = ["Home", "Our Products", "Contact Us"];
@@ -256,281 +158,137 @@ test.describe("Iframe - Only Path", () => {
           }
         ];
 
-        // Define web element sections
-        const menu = iFrame.getByRole("list").nth(1).getByRole("listitem");
-        const sections = iFrame.locator(".row .thumbnail");
-
         // Validate Menu QTY = 3 and Values
-        await expect(menu).toHaveCount(3);
-        await expect(menu).toHaveText(menuValues);
+        await expect(iframePage.navMenu).toHaveCount(3);
+        await expect(iframePage.navMenu).toHaveText(menuValues);
 
         // Validate Section QTY = 4 and Values
-        await expect(sections).toHaveCount(4);
+        await expect(iframePage.thumbnails).toHaveCount(4);
 
         for (const [index, section] of sectionContents.entries()) {
-          // Define each section title and Content
-          const sectionTitle = sections.locator(".sub-heading").nth(index);
-          const sectionContent = sections.locator(".caption").nth(index);
+          const sectionTitle = iframePage.thumbnails.locator(".sub-heading").nth(index);
+          const sectionContent = iframePage.thumbnails.locator(".caption").nth(index);
 
-          // Verify Title and Content matches the expected values
           await expect(sectionTitle).toHaveText(section.title);
           await expect(sectionContent).toContainText(section.body);
 
-          // If section has starts, valudate count
           if (section.stars) {
-            const sectionStars = sections.nth(index).locator(".glyphicon-star");
+            const sectionStars = iframePage.thumbnails.nth(index).locator(".glyphicon-star");
             expect(await sectionStars.count()).toBe(section.starCount);
           }
         }
       });
 
       test("Verify modal contents and buttons", async ({ page }) => {
-        // Navigate to the IFrame Page page in a separate Tab
-        const [iframePage] = await Promise.all([
-          page.waitForEvent("popup"),
-          page
-            .getByRole("link")
-            .filter({ hasText: /IFRAME/ })
-            .click()
-        ]);
+        const homePage = new HomePage(page);
+        const iframePage = await homePage.openIFrame();
 
-        await iframePage.waitForLoadState();
+        await iframePage.findOutMoreBtn.click();
 
-        // Define iFrame elements
-        const iFrame = iframePage.frameLocator("#frame");
+        await expect(iframePage.homeModal).toBeVisible();
+        await expect(iframePage.homeModalTitle).toBeVisible();
+        await expect(iframePage.homeModalContent).toBeVisible();
 
-        const modal = iFrame.locator("#myModal");
-        const modalBttn = iFrame.getByRole("button", {
-          name: "Find Out More!"
-        });
-        const modalAcceptBttn = iFrame
-          .getByRole("button", { name: "Find Out More" })
-          .nth(1);
-        const modalCloseBttn = iFrame.getByRole("button", {
-          name: "Close"
-        });
-        const modalCloseIcon = iFrame
-          .getByRole("button")
-          .filter({ has: iFrame.locator(":scope.close") });
-        const modalTitle = iFrame.getByRole("heading", {
-          name: "Welcome to webdriveruniversity.com"
-        });
-        const modalContent = iFrame
-          .getByRole("paragraph")
-          .filter({ hasText: "Welcome to webdriveruniversity" });
+        await iframePage.homeModal.scrollIntoViewIfNeeded();
+        await iframePage.homeModalAcceptBtn.click();
+        await expect(iframePage.homeModal).toBeHidden();
 
-        await modalBttn.click();
+        await iframePage.findOutMoreBtn.click();
 
-        await expect(modal).toBeVisible();
-        await expect(modalTitle).toBeVisible();
-        await expect(modalContent).toBeVisible();
+        await iframePage.homeModal.scrollIntoViewIfNeeded();
+        await iframePage.homeModalCloseBtn.click();
+        await expect(iframePage.homeModal).toBeHidden();
 
-        await modal.scrollIntoViewIfNeeded();
-        await modalAcceptBttn.click();
-        await expect(modal).toBeHidden();
+        await iframePage.findOutMoreBtn.click();
 
-        await modalBttn.click();
-
-        await modal.scrollIntoViewIfNeeded();
-        await modalCloseBttn.click();
-        await expect(modal).toBeHidden();
-
-        await modalBttn.click();
-
-        await modal.scrollIntoViewIfNeeded();
-        await modalCloseIcon.click();
-        await expect(modal).toBeHidden();
+        await iframePage.homeModal.scrollIntoViewIfNeeded();
+        await iframePage.homeModalCloseIcon.click();
+        await expect(iframePage.homeModal).toBeHidden();
       });
     });
   });
 
   test.describe("IFrame - Our Products", () => {
     test("Verify Header", async ({ page }) => {
-      // Navigate to the IFrame Page page in a separate Tab
-      const [iframePage] = await Promise.all([
-        page.waitForEvent("popup"),
-        page
-          .getByRole("link")
-          .filter({ hasText: /IFRAME/ })
-          .click()
-      ]);
+      const homePage = new HomePage(page);
+      const iframePage = await homePage.openIFrame();
 
-      await iframePage.waitForLoadState();
-
-      // Define iFrame elements
-      const iFrame = iframePage.frameLocator("#frame");
-
-      // Define Product Tab element and open tab
-      const productsTab = iFrame.getByRole("link", {
-        name: "Our Products"
-      });
-
-      await productsTab.click();
+      await iframePage.productsTab.click();
 
       // Verify page header
-      const headerTitle = iFrame.locator("#nav-title");
-      await expect(headerTitle).toContainText(/WebDriver/);
+      await expect(iframePage.productHeaderTitle).toContainText(/WebDriver/);
     });
 
     test("Verify Section Navigations", async ({ page }) => {
-      // Navigate to the IFrame Page page in a separate Tab
-      const [iframePage] = await Promise.all([
-        page.waitForEvent("popup"),
-        page
-          .getByRole("link")
-          .filter({ hasText: /IFRAME/ })
-          .click()
-      ]);
-
-      await iframePage.waitForLoadState();
-
-      // Define iFrame elements
-      const iFrame = iframePage.frameLocator("#frame");
-
-      // Define all menu tab sections
-      const homeTab = iFrame.getByRole("link", {
-        name: "Home"
-      });
-      const productsTab = iFrame.getByRole("link", {
-        name: "Our Products"
-      });
-      const contactTab = iFrame.getByRole("link", {
-        name: "Contact Us"
-      });
-
-      // Define each tab elements
-      const homeSection = iFrame
-        .getByRole("paragraph")
-        .filter({ hasText: "Who Are We?" });
-      const productSection = iFrame.getByRole("link", {
-        name: "Special Offers"
-      });
-      const contactTitle = iFrame.getByRole("heading", { name: "CONTACT US" });
+      const homePage = new HomePage(page);
+      const iframePage = await homePage.openIFrame();
 
       // Open contact section
-      await productsTab.click();
+      await iframePage.productsTab.click();
 
       // Verify initial state
-      await expect(homeSection).toBeHidden();
-      await expect(productSection).toBeAttached();
-      await expect(contactTitle).not.toBeAttached();
+      await expect(iframePage.homeSection).toBeHidden();
+      await expect(iframePage.productSection).toBeAttached();
+      await expect(iframePage.contactTitle).not.toBeAttached();
 
-      // Validate Product Navigation
-      await homeTab.click();
+      // Validate Home Navigation
+      await iframePage.homeTab.click();
 
-      await expect(homeSection).toBeVisible();
-      await expect(productSection).not.toBeAttached();
-      await expect(contactTitle).not.toBeAttached();
+      await expect(iframePage.homeSection).toBeVisible();
+      await expect(iframePage.productSection).not.toBeAttached();
+      await expect(iframePage.contactTitle).not.toBeAttached();
 
       // Validate Contact Us Navigation
-      await contactTab.click();
+      await iframePage.contactTab.click();
 
-      await expect(homeSection).not.toBeAttached();
-      await expect(productSection).not.toBeAttached();
-      await expect(contactTitle).toBeVisible();
+      await expect(iframePage.homeSection).not.toBeAttached();
+      await expect(iframePage.productSection).not.toBeAttached();
+      await expect(iframePage.contactTitle).toBeVisible();
     });
 
     test("Verify Product Sections and modals", async ({ page }) => {
-      // Navigate to the IFrame Page page in a separate Tab
-      const [iframePage] = await Promise.all([
-        page.waitForEvent("popup"),
-        page
-          .getByRole("link")
-          .filter({ hasText: /IFRAME/ })
-          .click()
-      ]);
+      const homePage = new HomePage(page);
+      const iframePage = await homePage.openIFrame();
 
-      await iframePage.waitForLoadState();
-
-      // Define iFrame elements
-      const iFrame = iframePage.frameLocator("#frame");
-
-      // Define Product Tab element and open tab
-      const productsTab = iFrame.getByRole("link", {
-        name: "Our Products"
-      });
-
-      await productsTab.click();
+      await iframePage.productsTab.click();
 
       // Verify Product Section QTY = 8
-      const sections = iFrame.locator(".thumbnail");
-      await expect(sections).toHaveCount(8);
-
-      // Define Sections
-      const specialOffers = iFrame.getByRole("link", {
-        name: "Special Offers"
-      });
-      const cameras = iFrame.getByRole("link", {
-        name: "Cameras"
-      });
-      const newLaptops = iFrame.getByRole("link", {
-        name: "New Laptops"
-      });
-      const usedLaptops = iFrame.getByRole("link", {
-        name: "Used Laptops"
-      });
-
-      const gameConsoles = iFrame.getByRole("link", {
-        name: "Game Consoles"
-      });
-      const components = iFrame.getByRole("link", {
-        name: "Components"
-      });
-      const desktopSystems = iFrame.getByRole("link", {
-        name: "Desktop Systems"
-      });
-      const audio = iFrame.getByRole("link", {
-        name: "Audio"
-      });
-
-      // Define Modal Elements
-      const modal = iFrame.locator("#myModal");
-      const modalProceedBttn = iFrame.getByRole("button", {
-        name: "Proceed"
-      });
-      const modalCloseBttn = iFrame.getByRole("button", {
-        name: "Close"
-      });
-      const modalCloseIcon = iFrame
-        .getByRole("button")
-        .filter({ has: iFrame.locator(":scope.close") });
-      const modalTitle = iFrame.getByRole("heading", {
-        name: "Special Offer! - Get 30% off"
-      });
-      const modalContent = iFrame.getByRole("paragraph").filter({
-        hasText: `Please Note: All orders must be over the value of £50, adding additional coupon codes to the basket are excluded from this offer. To receive 30% off please add the following code to the basket: ${process.env.DISCOUNT}`
-      });
+      await expect(iframePage.productThumbnails).toHaveCount(8);
 
       // Add sections to an array of sections
       const sectionsBlocks = [
-        specialOffers,
-        cameras,
-        newLaptops,
-        usedLaptops,
-        gameConsoles,
-        components,
-        desktopSystems,
-        audio
+        iframePage.productLink("Special Offers"),
+        iframePage.productLink("Cameras"),
+        iframePage.productLink("New Laptops"),
+        iframePage.productLink("Used Laptops"),
+        iframePage.productLink("Game Consoles"),
+        iframePage.productLink("Components"),
+        iframePage.productLink("Desktop Systems"),
+        iframePage.productLink("Audio")
       ];
+
+      const modalContent = iframePage.frame.getByRole("paragraph").filter({
+        hasText: `Please Note: All orders must be over the value of £50, adding additional coupon codes to the basket are excluded from this offer. To receive 30% off please add the following code to the basket: ${process.env.DISCOUNT}`
+      });
 
       // Iterate on each block opening, closing and validating modals
       for (const block of sectionsBlocks) {
         await block.click();
 
-        await expect(modal).toBeVisible();
-        await expect(modalTitle).toBeVisible();
+        await expect(iframePage.productModal).toBeVisible();
+        await expect(iframePage.productModalTitle).toBeVisible();
         await expect(modalContent).toBeVisible();
 
-        await modalProceedBttn.click();
-        await expect(modal).toBeHidden();
+        await iframePage.productProceedBtn.click();
+        await expect(iframePage.productModal).toBeHidden();
 
         await block.click();
-        await modalCloseBttn.click();
-        await expect(modal).toBeHidden();
+        await iframePage.productCloseBtn.click();
+        await expect(iframePage.productModal).toBeHidden();
 
         await block.click();
-        await modalCloseIcon.click();
-        await expect(modal).toBeHidden();
+        await iframePage.productCloseIcon.click();
+        await expect(iframePage.productModal).toBeHidden();
       }
     });
   });
@@ -538,126 +296,60 @@ test.describe("Iframe - Only Path", () => {
   test.describe("IFrame - Contact Us", () => {
     test.describe("IFrame - Contact Us - Happy Path", () => {
       test("Verify Contact US Page Header", async ({ page }) => {
-        // Navigate to the IFrame Page page in a separate Tab
-        const [iframePage] = await Promise.all([
-          page.waitForEvent("popup"),
-          page
-            .getByRole("link")
-            .filter({ hasText: /IFRAME/ })
-            .click()
-        ]);
+        const homePage = new HomePage(page);
+        const iframePage = await homePage.openIFrame();
 
-        await iframePage.waitForLoadState();
-
-        // Define iFrame elements
-        const iFrame = iframePage.frameLocator("#frame");
-
-        // Verify Header Title exists
-        const headerTitle = iFrame.locator("#nav-title");
+        // Verify Header Title exists (displayed on home tab by default)
+        const headerTitle = iframePage.frame.locator("#nav-title");
         await expect(headerTitle).toContainText(/WebdriverUniversity.com/);
       });
 
       test("Submit Form with all fields should work", async ({ page }) => {
-        // Navigate to the IFrame Page page in a separate Tab
-        const [iframePage] = await Promise.all([
-          page.waitForEvent("popup"),
-          page
-            .getByRole("link")
-            .filter({ hasText: /IFRAME/ })
-            .click()
-        ]);
+        const homePage = new HomePage(page);
+        const iframePage = await homePage.openIFrame();
 
-        await iframePage.waitForLoadState();
-
-        // Define iFrame elements
-        const iFrame = iframePage.frameLocator("#frame");
-
-        // Define Product Tab element and open tab
-        const contactTab = iFrame.getByRole("link", {
-          name: "Contact US"
-        });
-
-        await contactTab.click();
-
-        //Set Values for Input fields
-        const firstNameField = iFrame.getByPlaceholder("First Name");
-        const lastNameField = iFrame.getByPlaceholder("Last Name");
-        const emailField = iFrame.getByPlaceholder("Email Address");
-        const commentsField = iFrame.getByPlaceholder("Comments");
+        await iframePage.contactTab.click();
 
         // Fill all Fields
-        await firstNameField.fill(faker.person.firstName());
-        await lastNameField.fill(faker.person.lastName());
-        await emailField.fill(
-          faker.internet.email({ firstName: faker.person.firstName() })
+        await iframePage.fillContactForm(
+          faker.person.firstName(),
+          faker.person.lastName(),
+          faker.internet.email({ firstName: faker.person.firstName() }),
+          faker.lorem.paragraph(3)
         );
-        await commentsField.fill(faker.lorem.paragraph(3));
 
         // Submit form
-        const submitBttn = iFrame.getByRole("button", {
-          name: /submit/i
-        });
-        await submitBttn.click();
+        await iframePage.contactSubmitBtn.click();
 
         // Verify Success message form
-        const successMessage = iFrame.getByRole("heading", {
-          name: "Thank You for your Message!"
-        });
-
-        await expect(successMessage).toBeVisible();
+        await expect(iframePage.contactSuccess).toBeVisible();
 
         //Verify Animation Exist and is Correct
-        const animation = iFrame.locator("#fountainG");
-        const animationDots = iFrame.locator("#fountainG > .fountainG");
-
-        await expect(animation).toBeVisible();
-        await expect(animationDots).toHaveCount(8);
+        await expect(iframePage.contactAnimation).toBeVisible();
+        await expect(iframePage.contactAnimationDots).toHaveCount(8);
       });
 
       test("Reset form field should blank all of them", async ({ page }) => {
-        // Navigate to the IFrame Page page in a separate Tab
-        const [iframePage] = await Promise.all([
-          page.waitForEvent("popup"),
-          page
-            .getByRole("link")
-            .filter({ hasText: /IFRAME/ })
-            .click()
-        ]);
+        const homePage = new HomePage(page);
+        const iframePage = await homePage.openIFrame();
 
-        await iframePage.waitForLoadState();
-
-        // Define iFrame elements
-        const iFrame = iframePage.frameLocator("#frame");
-
-        // Define Product Tab element and open tab
-        const contactTab = iFrame.getByRole("link", {
-          name: "Contact US"
-        });
-
-        await contactTab.click();
-
-        //Set Values for Input fields
-        const firstNameField = iFrame.getByPlaceholder("First Name");
-        const lastNameField = iFrame.getByPlaceholder("Last Name");
-        const emailField = iFrame.getByPlaceholder("Email Address");
-        const commentsField = iFrame.getByPlaceholder("Comments");
+        await iframePage.contactTab.click();
 
         // Fill all Fields
-        await firstNameField.fill(faker.person.firstName());
-        await lastNameField.fill(faker.person.lastName());
-        await emailField.fill(
-          faker.internet.email({ firstName: faker.person.firstName() })
+        await iframePage.fillContactForm(
+          faker.person.firstName(),
+          faker.person.lastName(),
+          faker.internet.email({ firstName: faker.person.firstName() }),
+          faker.lorem.paragraph(3)
         );
-        await commentsField.fill(faker.lorem.paragraph(3));
 
         //Reset fields and verify they should be blank
-        const resetBttn = iFrame.getByRole("button", { name: /reset/i });
-        await resetBttn.click();
+        await iframePage.contactResetBtn.click();
 
-        await expect(firstNameField).toHaveText("");
-        await expect(lastNameField).toHaveText("");
-        await expect(emailField).toHaveText("");
-        await expect(commentsField).toHaveText("");
+        await expect(iframePage.contactFirstName).toHaveText("");
+        await expect(iframePage.contactLastName).toHaveText("");
+        await expect(iframePage.contactEmail).toHaveText("");
+        await expect(iframePage.contactComments).toHaveText("");
       });
     });
 
@@ -665,189 +357,107 @@ test.describe("Iframe - Only Path", () => {
       test("Submit Form without Filling any data should show an error", async ({
         page
       }) => {
-        // Navigate to the IFrame Page page in a separate Tab
-        const [iframePage] = await Promise.all([
-          page.waitForEvent("popup"),
-          page
-            .getByRole("link")
-            .filter({ hasText: /IFRAME/ })
-            .click()
-        ]);
+        const homePage = new HomePage(page);
+        const iframePage = await homePage.openIFrame();
 
-        await iframePage.waitForLoadState();
-
-        // Define iFrame elements
-        const iFrame = iframePage.frameLocator("#frame");
-
-        // Define Product Tab element and open tab
-        const contactTab = iFrame.getByRole("link", {
-          name: "Contact US"
-        });
-
-        await contactTab.click();
+        await iframePage.contactTab.click();
 
         // Submit empty form
-        const submitBttn = iFrame.getByRole("button", {
-          name: /submit/i
-        });
-        await submitBttn.click();
-
-        //Define page errors to validate
-        const errors = iFrame.locator("body");
-        const errorLength = iFrame.locator("body > br");
+        await iframePage.contactSubmitBtn.click();
 
         //Validate error QTY and texts
-        await expect(errorLength).toHaveCount(2);
-        await expect(errors).toContainText("all fields are required");
-        await expect(errors).toContainText("Invalid email address");
+        await expect(iframePage.contactErrorBreaks).toHaveCount(2);
+        await expect(iframePage.contactBodyErrors).toContainText("all fields are required");
+        await expect(iframePage.contactBodyErrors).toContainText("Invalid email address");
       });
 
       test("Submit form without any field should show an error", async ({
         page
       }) => {
-        // Navigate to the IFrame Page page in a separate Tab
-        const [iframePage] = await Promise.all([
-          page.waitForEvent("popup"),
-          page
-            .getByRole("link")
-            .filter({ hasText: /IFRAME/ })
-            .click()
-        ]);
+        const homePage = new HomePage(page);
+        const iframePage = await homePage.openIFrame();
 
-        await iframePage.waitForLoadState();
-
-        // Define iFrame elements
-        const iFrame = iframePage.frameLocator("#frame");
-
-        // Define Product Tab element and open tab
-        const contactTab = iFrame.getByRole("link", {
-          name: "Contact US"
-        });
-
-        await contactTab.click();
-
-        //Set Values for Input fields
-        const firstNameField = iFrame.getByPlaceholder("First Name");
-        const lastNameField = iFrame.getByPlaceholder("Last Name");
-        const emailField = iFrame.getByPlaceholder("Email Address");
-        const commentsField = iFrame.getByPlaceholder("Comments");
+        await iframePage.contactTab.click();
 
         // Fill First Name
-        await firstNameField.fill(faker.person.firstName());
+        await iframePage.contactFirstName.fill(faker.person.firstName());
 
         // Submit Form
-        const submitBttn = iFrame.getByRole("button", {
-          name: /submit/i
-        });
-        await submitBttn.click();
-
-        //Define page errors to validate
-        const errors = iFrame.locator("body");
-        const errorLength = iFrame.locator("body > br");
+        await iframePage.contactSubmitBtn.click();
 
         //Validate error QTY and texts
-        await expect(errorLength).toHaveCount(2);
-        await expect(errors).toContainText("all fields are required");
-        await expect(errors).toContainText("Invalid email address");
+        await expect(iframePage.contactErrorBreaks).toHaveCount(2);
+        await expect(iframePage.contactBodyErrors).toContainText("all fields are required");
+        await expect(iframePage.contactBodyErrors).toContainText("Invalid email address");
 
-        // Go back to the Contact Us Page
-        await iframePage.reload();
-        await contactTab.click();
+        // Reload and go back to Contact Us
+        await iframePage.reloadAndOpenContact();
 
         // Fill Last Name
-        await lastNameField.fill(faker.person.lastName());
+        await iframePage.contactLastName.fill(faker.person.lastName());
 
         // Submit Form
-        await submitBttn.click();
+        await iframePage.contactSubmitBtn.click();
 
         // Validate error QTY and texts
-        await expect(errorLength).toHaveCount(2);
-        await expect(errors).toContainText("all fields are required");
-        await expect(errors).toContainText("Invalid email address");
+        await expect(iframePage.contactErrorBreaks).toHaveCount(2);
+        await expect(iframePage.contactBodyErrors).toContainText("all fields are required");
+        await expect(iframePage.contactBodyErrors).toContainText("Invalid email address");
 
-        // Go back to the Contact Us Page
-        await iframePage.reload();
-        await contactTab.click();
+        // Reload and go back to Contact Us
+        await iframePage.reloadAndOpenContact();
 
         // Fill Email Field with a valid Email
-        await emailField.fill(
+        await iframePage.contactEmail.fill(
           faker.internet.email({ firstName: faker.person.firstName() })
         );
 
         // Submit Form
-        await submitBttn.click();
+        await iframePage.contactSubmitBtn.click();
 
         // Validate error QTY and texts
-        await expect(errorLength).toHaveCount(1);
-        await expect(errors).toContainText("all fields are required");
-        await expect(errors).not.toContainText("Invalid email address");
+        await expect(iframePage.contactErrorBreaks).toHaveCount(1);
+        await expect(iframePage.contactBodyErrors).toContainText("all fields are required");
+        await expect(iframePage.contactBodyErrors).not.toContainText("Invalid email address");
 
-        // Go back to the Contact Us Page
-        await iframePage.reload();
-        await contactTab.click();
+        // Reload and go back to Contact Us
+        await iframePage.reloadAndOpenContact();
 
-        // Fill Comments Field with a valid Email
-        await commentsField.fill(faker.lorem.paragraph(3));
+        // Fill Comments Field
+        await iframePage.contactComments.fill(faker.lorem.paragraph(3));
 
         // Submit Form
-        await submitBttn.click();
+        await iframePage.contactSubmitBtn.click();
 
         // Validate error QTY and texts
-        await expect(errorLength).toHaveCount(2);
-        await expect(errors).toContainText("all fields are required");
-        await expect(errors).toContainText("Invalid email address");
+        await expect(iframePage.contactErrorBreaks).toHaveCount(2);
+        await expect(iframePage.contactBodyErrors).toContainText("all fields are required");
+        await expect(iframePage.contactBodyErrors).toContainText("Invalid email address");
       });
 
       test("Submit all data without a valid email should show the email error", async ({
         page
       }) => {
-        // Navigate to the IFrame Page page in a separate Tab
-        const [iframePage] = await Promise.all([
-          page.waitForEvent("popup"),
-          page
-            .getByRole("link")
-            .filter({ hasText: /IFRAME/ })
-            .click()
-        ]);
+        const homePage = new HomePage(page);
+        const iframePage = await homePage.openIFrame();
 
-        await iframePage.waitForLoadState();
-
-        // Define iFrame elements
-        const iFrame = iframePage.frameLocator("#frame");
-
-        // Define Product Tab element and open tab
-        const contactTab = iFrame.getByRole("link", {
-          name: "Contact US"
-        });
-
-        await contactTab.click();
-
-        // Set Values for Input fields
-        const firstNameField = iFrame.getByPlaceholder("First Name");
-        const lastNameField = iFrame.getByPlaceholder("Last Name");
-        const emailField = iFrame.getByPlaceholder("Email Address");
-        const commentsField = iFrame.getByPlaceholder("Comments");
+        await iframePage.contactTab.click();
 
         // Fill all Fields (Invalid Email)
-        await firstNameField.fill(faker.person.firstName());
-        await lastNameField.fill(faker.person.lastName());
-        await emailField.fill(faker.person.middleName());
-        await commentsField.fill(faker.lorem.paragraph(3));
+        await iframePage.fillContactForm(
+          faker.person.firstName(),
+          faker.person.lastName(),
+          faker.person.middleName(),
+          faker.lorem.paragraph(3)
+        );
 
         // Submit form
-        const submitBttn = iFrame.getByRole("button", {
-          name: /submit/i
-        });
-        await submitBttn.click();
-
-        // Define page errors to validate
-        const errors = iFrame.locator("body");
-        const errorLength = iFrame.locator("body > br");
+        await iframePage.contactSubmitBtn.click();
 
         // Validate error QTY and texts
-        await expect(errorLength).toHaveCount(1);
-        await expect(errors).not.toContainText("all fields are required");
-        await expect(errors).toContainText("Invalid email address");
+        await expect(iframePage.contactErrorBreaks).toHaveCount(1);
+        await expect(iframePage.contactBodyErrors).not.toContainText("all fields are required");
+        await expect(iframePage.contactBodyErrors).toContainText("Invalid email address");
       });
     });
   });

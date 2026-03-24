@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { HomePage } from "../pages/home.page";
 
 test.describe("Hidden Elements - Only Path", () => {
   test.beforeEach(async ({ page }) => {
@@ -6,147 +7,85 @@ test.describe("Hidden Elements - Only Path", () => {
   });
 
   test("Verify URL, sections and footer", async ({ page }) => {
-    // Navigate to the Hidden Elements page in a separate Tab
-    const [hiddenPage] = await Promise.all([
-      page.waitForEvent("popup"),
-      page.getByRole("link").filter({ hasText: "HIDDEN ELEMENTS" }).click()
-    ]);
-
-    await hiddenPage.waitForLoadState();
+    const homePage = new HomePage(page);
+    const hiddenPage = await homePage.openHiddenElements();
 
     // Verify url
-    await expect(hiddenPage).toHaveURL(/Hidden-Elements/i);
+    await expect(hiddenPage.page).toHaveURL(/Hidden-Elements/i);
 
     // Verify Header Title exists
-    const headerTitle = hiddenPage.locator("#nav-title");
-    await expect(headerTitle).toContainText(/WebdriverUniversity/);
+    await expect(hiddenPage.headerTitle).toContainText(/WebdriverUniversity/);
 
     // Verify title is visible and exists
-    const title = hiddenPage.getByRole("heading", {
-      name: "Hidden Elements.."
-    });
-
-    await expect(title).toBeVisible();
+    await expect(hiddenPage.pageTitle).toBeVisible();
 
     // Define sections and verify QTY 3
-    const hiddenSections = hiddenPage.locator(".thumbnail");
-    await expect(hiddenSections).toHaveCount(3);
+    await expect(hiddenPage.sections).toHaveCount(3);
 
     // Verify footer text exists and is visible
-    const footerText = hiddenPage.getByRole("paragraph").last();
-
-    await expect(footerText).toContainText("Copyright");
-    await expect(footerText).toBeVisible();
+    await expect(hiddenPage.footer).toContainText("Copyright");
+    await expect(hiddenPage.footer).toBeVisible();
   });
 
   test("No displayed section shows no element and work correctly", async ({
     page
   }) => {
-    // Navigate to the Hidden Elements page in a separate Tab
-    const [hiddenPage] = await Promise.all([
-      page.waitForEvent("popup"),
-      page.getByRole("link").filter({ hasText: "HIDDEN ELEMENTS" }).click()
-    ]);
+    const homePage = new HomePage(page);
+    const hiddenPage = await homePage.openHiddenElements();
 
-    await hiddenPage.waitForLoadState();
+    await expect(hiddenPage.notDisplayedSection).toBeVisible();
 
-    // Define No Displayed section
-    const noDisplayedSection = hiddenPage
-      .locator(".thumbnail")
-      .filter({ hasText: "Not Displayed" });
-
-    await expect(noDisplayedSection).toBeVisible();
-
-    // Define modal for that section
-    const modal = page.getByRole("dialog");
-
+    // Bug 2 fix: dead code `const modal = page.getByRole("dialog")` removed
     // Verify no displayed element
-    const noDisplayedBttn = noDisplayedSection.locator("#button1");
-    await expect(noDisplayedBttn).toBeAttached();
-    await expect(noDisplayedBttn).toBeHidden();
+    await expect(hiddenPage.notDisplayedButton).toBeAttached();
+    await expect(hiddenPage.notDisplayedButton).toBeHidden();
   });
 
   test("Visibility Hidden section shows no element and work correctly", async ({
     page
   }) => {
-    // Navigate to the Hidden Elements page in a separate Tab
-    const [hiddenPage] = await Promise.all([
-      page.waitForEvent("popup"),
-      page.getByRole("link").filter({ hasText: "HIDDEN ELEMENTS" }).click()
-    ]);
+    const homePage = new HomePage(page);
+    const hiddenPage = await homePage.openHiddenElements();
 
-    await hiddenPage.waitForLoadState();
-
-    // Define No Displayed section
-    const hiddenSection = hiddenPage
-      .locator(".thumbnail")
-      .filter({ hasText: "Visibility Hidden" });
-
-    await expect(hiddenSection).toBeVisible();
+    await expect(hiddenPage.visibilityHiddenSection).toBeVisible();
 
     // Verify no displayed element
-    const hiddenBttn = hiddenSection.locator("#button2");
-    await expect(hiddenBttn).toBeAttached();
-    await expect(hiddenBttn).toBeHidden();
+    await expect(hiddenPage.hiddenButton).toBeAttached();
+    await expect(hiddenPage.hiddenButton).toBeHidden();
   });
 
   test("Zero Opacity Section should show an element, open a modal and work correcly", async ({
     page
   }) => {
-    // Navigate to the Hidden Elements page in a separate Tab
-    const [hiddenPage] = await Promise.all([
-      page.waitForEvent("popup"),
-      page.getByRole("link").filter({ hasText: "HIDDEN ELEMENTS" }).click()
-    ]);
+    const homePage = new HomePage(page);
+    const hiddenPage = await homePage.openHiddenElements();
 
-    await hiddenPage.waitForLoadState();
-
-    // Define No Displayed section
-    const opacitySection = hiddenPage
-      .locator(".thumbnail")
-      .filter({ hasText: "Zero Opacity" });
-
-    await expect(opacitySection).toBeVisible();
+    await expect(hiddenPage.zeroOpacitySection).toBeVisible();
 
     // Verify Opacity button
-    const opacityBttn = opacitySection.locator("#button3");
-    await expect(opacityBttn).toBeAttached();
-    await expect(opacityBttn).toBeVisible();
+    await expect(hiddenPage.opacityButton).toBeAttached();
+    await expect(hiddenPage.opacityButton).toBeVisible();
 
-    // Define modal elements
-    const modal = hiddenPage.getByRole("dialog");
-    const modalTitle = hiddenPage.getByRole("heading").filter({
-      hasText: "Well done! the Action Move & Click can become very useful!"
-    });
-    const modalContent = modal.getByRole("paragraph").filter({
-      hasText:
-        "Advanced user interactions (API) has been developed to enable you to perform more"
-    });
-
-    const modalList = modal.getByRole("listitem");
     const listItems = ["Drag & Drop", "Hover & Click", "Click & Hold...."];
 
-    const closeBttn = modal.getByRole("button", { name: "Close" });
-    const modalCloseIcon = modal.getByRole("button", { name: "×" });
-
     // Verify Inital State
-    await expect(modal).toBeHidden();
+    await expect(hiddenPage.modal).toBeHidden();
 
-    // Open the modal and veriy items
-    await opacityBttn.click();
+    // Open the modal and verify items
+    await hiddenPage.opacityButton.click();
 
-    await expect(modal).toBeVisible();
-    await expect(modalTitle).toBeVisible();
-    await expect(modalContent).toBeVisible();
-    await expect(modalList).toHaveText(listItems);
+    await expect(hiddenPage.modal).toBeVisible();
+    await expect(hiddenPage.modalTitle).toBeVisible();
+    await expect(hiddenPage.modalContent).toBeVisible();
+    await expect(hiddenPage.modalList).toHaveText(listItems);
 
-    // Verify close icon and button work correclty
-    await closeBttn.click();
-    await expect(modal).toBeHidden();
+    // Verify close icon and button work correctly
+    await hiddenPage.modalCloseBtn.click();
+    await expect(hiddenPage.modal).toBeHidden();
 
-    await opacityBttn.click();
+    await hiddenPage.opacityButton.click();
 
-    await modalCloseIcon.click();
-    await expect(modal).toBeHidden();
+    await hiddenPage.modalCloseIcon.click();
+    await expect(hiddenPage.modal).toBeHidden();
   });
 });

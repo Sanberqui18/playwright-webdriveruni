@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { HomePage } from "../pages/home.page";
 
 test.describe("Actions - Happy Path", () => {
   test.beforeEach(async ({ page }) => {
@@ -8,64 +9,32 @@ test.describe("Actions - Happy Path", () => {
   test("Verify Page URL, Header, Title, Sections and Footer", async ({
     page
   }) => {
-    // Navigate to the Actions page in a separate Tab
-    const [actionsPage] = await Promise.all([
-      page.waitForEvent("popup"),
-      page
-        .getByRole("link")
-        .filter({ hasText: /ACTIONS/ })
-        .click()
-    ]);
-
-    await actionsPage.waitForLoadState();
+    const homePage = new HomePage(page);
+    const actionsPage = await homePage.openActions();
 
     // Verify url and Header title
-    const headerTitle = actionsPage.getByRole("navigation");
+    await expect(actionsPage.page).toHaveURL(/Actions/i);
+    await expect(actionsPage.pageNavTitle).toContainText(/WebdriverUniversity.com/);
 
-    await expect(actionsPage).toHaveURL(/Actions/i);
-    await expect(headerTitle).toContainText(/WebdriverUniversity.com/);
-
-    // Define titles and sections
-    const title = actionsPage
-      .getByRole("heading")
-      .locator(":scope#main-header");
-
-    const bigSections = actionsPage.locator(".col-lg-6");
-    const tinySection1 = actionsPage.locator("#div-hover");
-    const tinySection2 = actionsPage.locator("#click-box");
-
-    const footer = actionsPage.getByRole("paragraph").last();
-
-    // Verify Sections QTY tiny 2 and big 2) and titles
-    await expect(title).toHaveText(
+    await expect(actionsPage.mainHeader).toHaveText(
       "The Key to Success is to take massive ACTION!"
     );
 
-    await expect(bigSections).toHaveCount(2);
-    await expect(tinySection1).toHaveCount(1);
-    await expect(tinySection2).toHaveCount(1);
+    await expect(actionsPage.bigSections).toHaveCount(2);
+    await expect(actionsPage.tinyHoverSection).toHaveCount(1);
+    await expect(actionsPage.tinyClickBox).toHaveCount(1);
 
-    await expect(footer).toContainText("Copyright");
+    await expect(actionsPage.footer).toContainText("Copyright");
   });
 
   test("Drag and Drop section should work correctly", async ({ page }) => {
-    // Navigate to the Actions page in a separate Tab
-    const [actionsPage] = await Promise.all([
-      page.waitForEvent("popup"),
-      page
-        .getByRole("link")
-        .filter({ hasText: /ACTIONS/ })
-        .click()
-    ]);
-
-    await actionsPage.waitForLoadState();
+    const homePage = new HomePage(page);
+    const actionsPage = await homePage.openActions();
 
     // Define drag and drop elements
-    const dragAndDropSection = actionsPage
-      .locator("#div-drag-drop-thumbnail")
-      .first();
-    const draggable = dragAndDropSection.locator("#draggable");
-    const droppable = dragAndDropSection.locator("#droppable");
+    const dragDropSection = actionsPage.dragDropSectionFirst;
+    const draggable = actionsPage.draggable(dragDropSection);
+    const droppable = actionsPage.droppable(dragDropSection);
 
     // Verify initial state
     await expect(draggable).toHaveCSS("position", "relative");
@@ -75,70 +44,50 @@ test.describe("Actions - Happy Path", () => {
     // Drag the draggable to the droppable section
     await draggable.dragTo(droppable);
 
-    // Verfiy droppable text changed
+    // Verify droppable text changed
     await expect(droppable).toContainText("Dropped!");
 
     // Refresh the page to get all reseted
-    await actionsPage.reload();
+    await actionsPage.page.reload();
 
     //Drag to different locations and verify text
     await draggable.dragTo(droppable, { targetPosition: { x: 35, y: 30 } });
     await expect(droppable).toContainText("Dropped!");
-    await actionsPage.reload();
+    await actionsPage.page.reload();
 
     await draggable.dragTo(droppable, { targetPosition: { x: 190, y: 30 } });
     await expect(droppable).toContainText("Dropped!");
-    await actionsPage.reload();
+    await actionsPage.page.reload();
 
     await draggable.dragTo(droppable, { targetPosition: { x: 350, y: 30 } });
     await expect(droppable).toContainText("Dropped!");
-    await actionsPage.reload();
+    await actionsPage.page.reload();
 
     await draggable.dragTo(droppable, { targetPosition: { x: 35, y: 200 } });
     await expect(droppable).toContainText("Dropped!");
-    await actionsPage.reload();
+    await actionsPage.page.reload();
 
-    await draggable.dragTo(droppable, {
-      targetPosition: { x: 35, y: 100 }
-    });
+    await draggable.dragTo(droppable, { targetPosition: { x: 35, y: 100 } });
     await expect(droppable).toContainText("Dropped!");
-    await actionsPage.reload();
+    await actionsPage.page.reload();
 
-    await draggable.dragTo(droppable, {
-      targetPosition: { x: 190, y: 200 }
-    });
+    await draggable.dragTo(droppable, { targetPosition: { x: 190, y: 200 } });
     await expect(droppable).toContainText("Dropped!");
-    await actionsPage.reload();
+    await actionsPage.page.reload();
 
-    await draggable.dragTo(droppable, {
-      targetPosition: { x: 350, y: 200 }
-    });
+    await draggable.dragTo(droppable, { targetPosition: { x: 350, y: 200 } });
     await expect(droppable).toContainText("Dropped!");
-    await actionsPage.reload();
+    await actionsPage.page.reload();
 
-    await draggable.dragTo(droppable, {
-      targetPosition: { x: 350, y: 100 }
-    });
+    await draggable.dragTo(droppable, { targetPosition: { x: 350, y: 100 } });
     await expect(droppable).toContainText("Dropped!");
   });
 
   test("Double Click section should work correctly", async ({ page }) => {
-    // Navigate to the Actions page in a separate Tab
-    const [actionsPage] = await Promise.all([
-      page.waitForEvent("popup"),
-      page
-        .getByRole("link")
-        .filter({ hasText: /ACTIONS/ })
-        .click()
-    ]);
+    const homePage = new HomePage(page);
+    const actionsPage = await homePage.openActions();
 
-    await actionsPage.waitForLoadState();
-
-    // Define double click elements
-    const dblClickSection = actionsPage
-      .locator("#div-drag-drop-thumbnail")
-      .last();
-    const dblClickBttn = dblClickSection.locator("#double-click");
+    const dblClickBttn = actionsPage.doubleClickButton;
 
     // Verify inital state
     await expect(dblClickBttn).toContainText("Double Click Me!");
@@ -151,41 +100,27 @@ test.describe("Actions - Happy Path", () => {
     // Double Click the element again and verify color changed
     await dblClickBttn.dblclick();
     await expect(dblClickBttn).toHaveClass("div-double-click");
-
-    //
   });
 
   test("Hover Over section should work correctly", async ({ page }) => {
-    // Navigate to the Actions page in a separate Tab
-    const [actionsPage] = await Promise.all([
-      page.waitForEvent("popup"),
-      page
-        .getByRole("link")
-        .filter({ hasText: /ACTIONS/ })
-        .click()
-    ]);
+    const homePage = new HomePage(page);
+    const actionsPage = await homePage.openActions();
 
-    await actionsPage.waitForLoadState();
+    const hoverFirst = actionsPage.hoverButtons.nth(0);
+    const hoverSecond = actionsPage.hoverButtons.nth(1);
+    const hoverThird = actionsPage.hoverButtons.nth(2);
 
-    // Define hover over elements
-    const hoverSection = actionsPage.locator("#div-hover");
-    const hoverBttns = hoverSection.locator(".dropbtn");
-    const hoverFirst = hoverBttns.nth(0);
-    const hoverSecond = hoverBttns.nth(1);
-    const hoverThird = hoverBttns.nth(2);
-
-    const alerts = hoverSection.locator(".list-alert");
-    const firstAlert = alerts.nth(0);
-    const secondAlert = alerts.nth(1);
-    const thirdAlert = alerts.nth(2);
-    const fourthAlert = alerts.nth(3);
+    const firstAlert = actionsPage.hoverAlerts.nth(0);
+    const secondAlert = actionsPage.hoverAlerts.nth(1);
+    const thirdAlert = actionsPage.hoverAlerts.nth(2);
+    const fourthAlert = actionsPage.hoverAlerts.nth(3);
 
     // Verify Initial State
     await expect(hoverFirst).toContainText("Hover Over Me First!");
     await expect(hoverSecond).toContainText("Hover Over Me Second!");
     await expect(hoverThird).toContainText("Hover Over Me Third!");
 
-    await expect(alerts).toHaveCount(4);
+    await expect(actionsPage.hoverAlerts).toHaveCount(4);
 
     await expect(firstAlert).toBeHidden();
     await expect(secondAlert).toBeHidden();
@@ -198,13 +133,9 @@ test.describe("Actions - Happy Path", () => {
     await expect(fourthAlert).toHaveText("Link 1");
 
     //Define dialog event (alert) before clicking on the buttons
-    //Grab alert message to assert afterwards
     let successMessage: string = "";
-    actionsPage.on("dialog", async (dialog) => {
-      // Grab allert message
+    actionsPage.page.on("dialog", async (dialog) => {
       successMessage = dialog.message();
-
-      // Verify success message from the dialog
       expect(successMessage).toContain("Well done you clicked on the link!");
       await dialog.accept();
     });
@@ -234,19 +165,10 @@ test.describe("Actions - Happy Path", () => {
   });
 
   test("Click and Hold section should work correclty", async ({ page }) => {
-    // Navigate to the Actions page in a separate Tab
-    const [actionsPage] = await Promise.all([
-      page.waitForEvent("popup"),
-      page
-        .getByRole("link")
-        .filter({ hasText: /ACTIONS/ })
-        .click()
-    ]);
+    const homePage = new HomePage(page);
+    const actionsPage = await homePage.openActions();
 
-    await actionsPage.waitForLoadState();
-
-    // Define click and hold elements
-    const clickAndHoldBttn = actionsPage.locator("#click-box");
+    const clickAndHoldBttn = actionsPage.clickAndHoldBox;
 
     // Verify Initial State
     await expect(clickAndHoldBttn).toContainText("Click and Hold!");
@@ -280,31 +202,20 @@ test.describe("Actions - Edge Path", () => {
   test("Drag and Drop section - Releasing drag outside the drop secion should not change the color", async ({
     page
   }) => {
-    // Navigate to the Actions page in a separate Tab
-    const [actionsPage] = await Promise.all([
-      page.waitForEvent("popup"),
-      page
-        .getByRole("link")
-        .filter({ hasText: /ACTIONS/ })
-        .click()
-    ]);
+    const homePage = new HomePage(page);
+    const actionsPage = await homePage.openActions();
 
-    await actionsPage.waitForLoadState();
-
-    // Define drag and drop elements
-    const dragAndDropSection = actionsPage
-      .locator("#div-drag-drop-thumbnail")
-      .first();
-    const draggable = dragAndDropSection.locator("#draggable");
-    const droppable = dragAndDropSection.locator("#droppable");
+    const dragDropSection = actionsPage.dragDropSectionFirst;
+    const draggable = actionsPage.draggable(dragDropSection);
+    const droppable = actionsPage.droppable(dragDropSection);
 
     // Drag the draggable outside the droppable section
-    await draggable.dragTo(dragAndDropSection, {
+    await draggable.dragTo(dragDropSection, {
       targetPosition: { x: 350, y: 10 }
     });
     await expect(droppable).toContainText("DROP HERE!");
 
-    await draggable.dragTo(dragAndDropSection, {
+    await draggable.dragTo(dragDropSection, {
       targetPosition: { x: 0, y: 0 }
     });
     await expect(droppable).toContainText("DROP HERE!");
@@ -313,24 +224,12 @@ test.describe("Actions - Edge Path", () => {
   test("Double Click section - Clicking once should not change click color", async ({
     page
   }) => {
-    // Navigate to the Actions page in a separate Tab
-    const [actionsPage] = await Promise.all([
-      page.waitForEvent("popup"),
-      page
-        .getByRole("link")
-        .filter({ hasText: /ACTIONS/ })
-        .click()
-    ]);
+    const homePage = new HomePage(page);
+    const actionsPage = await homePage.openActions();
 
-    await actionsPage.waitForLoadState();
+    const dblClickBttn = actionsPage.doubleClickButton;
 
-    // Define double click elements
-    const dblClickSection = actionsPage
-      .locator("#div-drag-drop-thumbnail")
-      .last();
-    const dblClickBttn = dblClickSection.locator("#double-click");
-
-    // Perforn just one click and verify the color does not change
+    // Perform just one click and verify the color does not change
     await dblClickBttn.click();
     await expect(dblClickBttn).toContainText("Double Click Me!");
     await expect(dblClickBttn).toHaveClass("div-double-click");
