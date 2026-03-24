@@ -1,27 +1,22 @@
 import { test, expect } from "@playwright/test";
+import { HomePage } from "../pages/home.page";
 
 test.describe("Click Buttons - Only Path", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
   });
+
   test("Page URL, Heading, Title and Copywright should be correct", async ({
     page
   }) => {
-    // Navigate to the Click Buttons page in a separate Tab
-    const clickBttnPromise = page.waitForEvent("popup");
-    await page.getByRole("link").filter({ hasText: "BUTTON CLICKS" }).click();
-    const clickBttnPage = await clickBttnPromise;
-    await clickBttnPage.waitForLoadState();
+    const homePage = new HomePage(page);
+    const clickBttnPage = await homePage.openButtonClicks();
 
     // Verify Header Title exists
-    const headerTitle = clickBttnPage.locator("#nav-title");
-    await expect(headerTitle).toContainText(/WebdriverUniversity.com/);
+    await expect(clickBttnPage.headerTitle).toContainText(/WebdriverUniversity.com/);
 
     // Verify Page Title exists and is correct
-    const title = clickBttnPage.getByRole("heading", {
-      name: "Lets Get Clicking!"
-    });
-    await expect(title).toBeVisible();
+    await expect(clickBttnPage.pageHeading).toBeVisible();
 
     // Define expected section/button titles and page sections
     const titles = [
@@ -32,11 +27,9 @@ test.describe("Click Buttons - Only Path", () => {
 
     const buttons = ["CLICK ME!", "CLICK ME!!", "CLICK ME!!!"];
 
-    const clickBoxes = clickBttnPage.locator(".thumbnail");
-
     // Verify each section title and content QTY= 3 are correct
     for (const key in titles) {
-      const clickBox = clickBoxes.nth(parseInt(key));
+      const clickBox = clickBttnPage.sections.nth(parseInt(key));
       const textList = clickBox.locator(".section-title > ol > li");
       const buttonText = clickBox.locator(".caption > span");
 
@@ -45,32 +38,15 @@ test.describe("Click Buttons - Only Path", () => {
       await expect(buttonText).toHaveText(buttons[parseInt(key)]);
     }
 
-    // Define copywright locator and verify it is visible
-    const copywrightText = page.getByText("Copyright © www.GianniBruno.com");
-    await expect(copywrightText).toBeVisible();
+    // Bug 1 fix: copyrightText is now scoped to clickBttnPage (popup), not the home page
+    await expect(clickBttnPage.copyrightText).toBeVisible();
   });
 
   test("Clicking on all buttons should open a modal and contain expected text", async ({
     page
   }) => {
-    // Navigate to the Click Buttons page in a separate Tab
-    const clickBttnPromise = page.waitForEvent("popup");
-    await page.getByRole("link").filter({ hasText: "BUTTON CLICKS" }).click();
-    const clickBttnPage = await clickBttnPromise;
-    await clickBttnPage.waitForLoadState();
-
-    // Define button variables
-    const buttons = [
-      clickBttnPage.getByText("CLICK ME!", { exact: true }),
-      clickBttnPage.getByText("CLICK ME!!", { exact: true }),
-      clickBttnPage.getByText("CLICK ME!!!", { exact: true })
-    ];
-
-    // Define Modal and their components
-    const modal = clickBttnPage.locator(".modal-content");
-    const modalTitle = modal.locator(".modal-header > h4");
-    const modalContent = modal.locator(".modal-body");
-    // const closeBttn = modal.getByRole("button", { name: "Close" });
+    const homePage = new HomePage(page);
+    const clickBttnPage = await homePage.openButtonClicks();
 
     // Define expected texts
     const expectedModalTxts = [
@@ -95,13 +71,13 @@ test.describe("Click Buttons - Only Path", () => {
     // Click on Buttons and verify modal texts
     for (const [key, modalValue] of expectedModalTxts.entries()) {
       // eslint-disable-next-line playwright/no-force-option
-      await buttons[key].click({ force: true });
-      await expect(modalTitle.nth(key)).toHaveText(modalValue.title);
-      await expect(modalContent.nth(key)).toContainText(modalValue.body);
+      await clickBttnPage.clickMeButton(key as 0 | 1 | 2).click({ force: true });
+      await expect(clickBttnPage.modalTitles.nth(key)).toHaveText(modalValue.title);
+      await expect(clickBttnPage.modalBodies.nth(key)).toContainText(modalValue.body);
 
       // eslint-disable-next-line playwright/no-conditional-in-test
       if (modalValue.list) {
-        const modalList = modalContent.locator("ul > li");
+        const modalList = clickBttnPage.modalBodies.locator("ul > li");
         // eslint-disable-next-line playwright/no-conditional-expect
         await expect(modalList).toHaveText(modalValue.items as string[]);
       }
