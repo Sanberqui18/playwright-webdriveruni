@@ -23,10 +23,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: "html",
+  /* 2 workers per shard on CI (ubuntu-latest has 2 vCPUs); unlimited locally. */
+  workers: process.env.CI ? 2 : undefined,
+  /* blob on CI so shards can be merged into one HTML report; HTML locally. */
+  reporter: process.env.CI ? "blob" : "html",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
