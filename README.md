@@ -1,7 +1,5 @@
 # playwright-webdriveruni
 
-![E2E Tests](https://github.com/SantiagoBernal/playwright-webdriveruni/actions/workflows/e2e.yml/badge.svg)
-
 An end-to-end test automation suite for [WebdriverUniversity.com](https://webdriveruniversity.com), built with **Playwright**, **TypeScript**, and **GitHub Actions**.
 
 ---
