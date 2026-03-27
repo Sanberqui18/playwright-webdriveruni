@@ -1,16 +1,8 @@
 /* eslint-disable playwright/no-wait-for-timeout */
-import { test, expect } from "@playwright/test";
-import { HomePage } from "../pages/home.page";
+import { test, expect } from "./fixtures";
 
 test.describe("Text Effects - Only path", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
-
-  test("Verify page header, titles and button texts", async ({ page }) => {
-    const homePage = new HomePage(page);
-    const textAffectsPage = await homePage.openTextAffects();
-
+  test("Verify page header, titles and button texts", async ({ textAffectsPage }) => {
     // Verify url
     await expect(textAffectsPage.page).toHaveURL(/Accordion/);
 
@@ -37,11 +29,8 @@ test.describe("Text Effects - Only path", () => {
   });
 
   test("Verify button texts are initially hidden and show when clicking on them", async ({
-    page
+    textAffectsPage
   }) => {
-    const homePage = new HomePage(page);
-    const textAffectsPage = await homePage.openTextAffects();
-
     // Define Buttons
     const manualTestingBttn = textAffectsPage.page.getByRole("button", {
       name: "Manual Testing"
@@ -91,10 +80,7 @@ test.describe("Text Effects - Only path", () => {
     await expect(automationBttn).not.toHaveClass("accordion active");
   });
 
-  test("Verify asyncronous actions generated in page", async ({ page }) => {
-    const homePage = new HomePage(page);
-    const textAffectsPage = await homePage.openTextAffects();
-
+  test("Verify asyncronous actions generated in page", async ({ textAffectsPage }) => {
     // Define Hide elements
     const appearTextBttn = textAffectsPage.page.getByRole("button", {
       name: "Keep Clicking!"

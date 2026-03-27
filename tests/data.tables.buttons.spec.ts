@@ -1,59 +1,45 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import { faker } from "@faker-js/faker";
-import { HomePage } from "../pages/home.page";
 
 test.describe("Data Tables and Buttons - Only Path", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
-
-  test("Verify URL, sections and footer", async ({ page }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
-
+  test("Verify URL, sections and footer", async ({ dataTablesButtonsPage }) => {
     // Verify url
-    await expect(dataPage.page).toHaveURL(/Data-Table/i);
+    await expect(dataTablesButtonsPage.page).toHaveURL(/Data-Table/i);
 
     // Verify Header Title exists
-    await expect(dataPage.headerTitle).toContainText(/WebdriverUniversity/);
+    await expect(dataTablesButtonsPage.headerTitle).toContainText(/WebdriverUniversity/);
 
     // Verify title is visible and exists
-    await expect(dataPage.pageTitle).toBeVisible();
+    await expect(dataTablesButtonsPage.pageTitle).toBeVisible();
 
     // Define sections and verify QTY = 8
-    await expect(dataPage.sections).toHaveCount(8);
+    await expect(dataTablesButtonsPage.sections).toHaveCount(8);
 
     // Verify footer text exists and is visible
-    await expect(dataPage.footer).toContainText("Copyright");
-    await expect(dataPage.footer).toBeVisible();
+    await expect(dataTablesButtonsPage.footer).toContainText("Copyright");
+    await expect(dataTablesButtonsPage.footer).toBeVisible();
   });
 
   // Data Section
 
   test("Data Section - Verify inital state fields are empty", async ({
-    page
+    dataTablesButtonsPage
   }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
-
     //Verify initial state
-    await expect(dataPage.firstNameField).toHaveValue("");
-    await expect(dataPage.lastNameField).toHaveValue("");
-    await expect(dataPage.textAreaField).toHaveValue("      ");
+    await expect(dataTablesButtonsPage.firstNameField).toHaveValue("");
+    await expect(dataTablesButtonsPage.lastNameField).toHaveValue("");
+    await expect(dataTablesButtonsPage.textAreaField).toHaveValue("      ");
   });
 
   test("Data Section - Verify Table 1 information is correct", async ({
-    page
+    dataTablesButtonsPage
   }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
-
     // Verify it exists and is visible
-    await expect(dataPage.table1).toBeVisible();
+    await expect(dataTablesButtonsPage.table1).toBeVisible();
 
     //  Define table elements
-    const tableHeaders = dataPage.table1.locator("th");
-    const tableValues = dataPage.table1.locator("td");
+    const tableHeaders = dataTablesButtonsPage.table1.locator("th");
+    const tableValues = dataTablesButtonsPage.table1.locator("td");
 
     // Define expected values
     const headers = ["Firstname", "Lastname", "Age"];
@@ -78,17 +64,14 @@ test.describe("Data Tables and Buttons - Only Path", () => {
   });
 
   test("Data Section - Verify Table 2 information is correct", async ({
-    page
+    dataTablesButtonsPage
   }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
-
     // Verify it exists and is visible
-    await expect(dataPage.table2).toBeVisible();
+    await expect(dataTablesButtonsPage.table2).toBeVisible();
 
     //  Define table elements
-    const tableHeaders = dataPage.table2.locator("th");
-    const tableValues = dataPage.table2.locator("td");
+    const tableHeaders = dataTablesButtonsPage.table2.locator("th");
+    const tableValues = dataTablesButtonsPage.table2.locator("td");
 
     // Define expected values
     const headers = ["Firstname", "Lastname", "Age"];
@@ -112,46 +95,40 @@ test.describe("Data Tables and Buttons - Only Path", () => {
     await expect(tableValues).toHaveText(values);
   });
 
-  test("Data Section - Verify input values work correcly", async ({ page }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
-
+  test("Data Section - Verify input values work correcly", async ({ dataTablesButtonsPage }) => {
     //Define values
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
     const text = faker.lorem.sentence({ min: 2, max: 4 });
 
     // Fill values
-    await dataPage.firstNameField.fill(firstName);
-    await dataPage.lastNameField.fill(lastName);
-    await dataPage.textAreaField.fill(text);
+    await dataTablesButtonsPage.firstNameField.fill(firstName);
+    await dataTablesButtonsPage.lastNameField.fill(lastName);
+    await dataTablesButtonsPage.textAreaField.fill(text);
 
     // Verify values
-    await expect(dataPage.firstNameField).toHaveValue(firstName);
-    await expect(dataPage.lastNameField).toHaveValue(lastName);
-    await expect(dataPage.textAreaField).toHaveValue(text);
+    await expect(dataTablesButtonsPage.firstNameField).toHaveValue(firstName);
+    await expect(dataTablesButtonsPage.lastNameField).toHaveValue(lastName);
+    await expect(dataTablesButtonsPage.textAreaField).toHaveValue(text);
 
     // Delete values
-    await dataPage.firstNameField.clear();
-    await dataPage.lastNameField.clear();
-    await dataPage.textAreaField.clear();
+    await dataTablesButtonsPage.firstNameField.clear();
+    await dataTablesButtonsPage.lastNameField.clear();
+    await dataTablesButtonsPage.textAreaField.clear();
 
     // Verify fields are empty
-    await expect(dataPage.firstNameField).toHaveValue("");
-    await expect(dataPage.lastNameField).toHaveValue("");
-    await expect(dataPage.textAreaField).toHaveValue("");
+    await expect(dataTablesButtonsPage.firstNameField).toHaveValue("");
+    await expect(dataTablesButtonsPage.lastNameField).toHaveValue("");
+    await expect(dataTablesButtonsPage.textAreaField).toHaveValue("");
   });
 
   // BreadCrumb
 
-  test("BreadCrumb Section - Verify title and values", async ({ page }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
-
-    await dataPage.breadcrumbSection.scrollIntoViewIfNeeded();
+  test("BreadCrumb Section - Verify title and values", async ({ dataTablesButtonsPage }) => {
+    await dataTablesButtonsPage.breadcrumbSection.scrollIntoViewIfNeeded();
 
     // Define section items
-    const title = dataPage.breadcrumbSection.getByRole("heading", {
+    const title = dataTablesButtonsPage.breadcrumbSection.getByRole("heading", {
       name: "Breadcrumb"
     });
 
@@ -159,18 +136,15 @@ test.describe("Data Tables and Buttons - Only Path", () => {
 
     // Verify texts
     await expect(title).toBeVisible();
-    await expect(dataPage.breadcrumbItems).toHaveText(breadcrumbValues);
+    await expect(dataTablesButtonsPage.breadcrumbItems).toHaveText(breadcrumbValues);
   });
 
-  test("BreadCrumb Section - Verify breadcrumb options", async ({ page }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
+  test("BreadCrumb Section - Verify breadcrumb options", async ({ dataTablesButtonsPage }) => {
+    await dataTablesButtonsPage.breadcrumbSection.scrollIntoViewIfNeeded();
 
-    await dataPage.breadcrumbSection.scrollIntoViewIfNeeded();
-
-    const home = dataPage.breadcrumbItems.filter({ hasText: "Home" });
-    const aboutUs = dataPage.breadcrumbItems.filter({ hasText: "About Us" });
-    const contactUs = dataPage.breadcrumbItems.filter({ hasText: "Contact Us" });
+    const home = dataTablesButtonsPage.breadcrumbItems.filter({ hasText: "Home" });
+    const aboutUs = dataTablesButtonsPage.breadcrumbItems.filter({ hasText: "About Us" });
+    const contactUs = dataTablesButtonsPage.breadcrumbItems.filter({ hasText: "Contact Us" });
 
     // Verify options status
     await expect(home.locator("a")).toHaveAttribute("href", "#");
@@ -179,28 +153,25 @@ test.describe("Data Tables and Buttons - Only Path", () => {
 
     // Click on options and verify redirection
     await home.click();
-    await expect(dataPage.page).toHaveURL(/Data-Table/i);
+    await expect(dataTablesButtonsPage.page).toHaveURL(/Data-Table/i);
 
-    await dataPage.breadcrumbSection.scrollIntoViewIfNeeded();
+    await dataTablesButtonsPage.breadcrumbSection.scrollIntoViewIfNeeded();
 
     await aboutUs.click();
-    await expect(dataPage.page).toHaveURL(/Data-Table/i);
+    await expect(dataTablesButtonsPage.page).toHaveURL(/Data-Table/i);
   });
 
   // Badges
 
-  test("Badges Section - Verify title and values", async ({ page }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
-
-    await dataPage.badgeSection.scrollIntoViewIfNeeded();
+  test("Badges Section - Verify title and values", async ({ dataTablesButtonsPage }) => {
+    await dataTablesButtonsPage.badgeSection.scrollIntoViewIfNeeded();
 
     // Define section items
-    const title = dataPage.badgeSection.getByRole("heading", {
+    const title = dataTablesButtonsPage.badgeSection.getByRole("heading", {
       name: "Badges"
     });
 
-    const menu = dataPage.badgeMenuItems;
+    const menu = dataTablesButtonsPage.badgeMenuItems;
 
     const deals = menu.filter({ hasText: "Today's Deals" });
     const allProducts = menu.filter({ hasText: "All Products" });
@@ -217,14 +188,11 @@ test.describe("Data Tables and Buttons - Only Path", () => {
 
   //Pagination
 
-  test("Pagination Section - Verify title and values", async ({ page }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
-
-    await dataPage.paginationSection.scrollIntoViewIfNeeded();
+  test("Pagination Section - Verify title and values", async ({ dataTablesButtonsPage }) => {
+    await dataTablesButtonsPage.paginationSection.scrollIntoViewIfNeeded();
 
     // Define section items
-    const title = dataPage.paginationSection.getByRole("heading", {
+    const title = dataTablesButtonsPage.paginationSection.getByRole("heading", {
       name: "Pagination"
     });
 
@@ -234,52 +202,46 @@ test.describe("Data Tables and Buttons - Only Path", () => {
     await expect(title).toBeVisible();
 
     // Verify pagination options
-    await expect(dataPage.paginationListItems).toHaveText(expectedOptions);
+    await expect(dataTablesButtonsPage.paginationListItems).toHaveText(expectedOptions);
   });
 
   test("Pagination Section - Verify pagination works correctly", async ({
-    page
+    dataTablesButtonsPage
   }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
-
-    await dataPage.paginationSection.scrollIntoViewIfNeeded();
+    await dataTablesButtonsPage.paginationSection.scrollIntoViewIfNeeded();
 
     // Verify pagination works correctly
-    await dataPage.clickPaginationPage(/«/);
-    await expect(dataPage.page).toHaveURL(/Data-Table/i);
-    await dataPage.paginationSection.scrollIntoViewIfNeeded();
+    await dataTablesButtonsPage.clickPaginationPage(/«/);
+    await expect(dataTablesButtonsPage.page).toHaveURL(/Data-Table/i);
+    await dataTablesButtonsPage.paginationSection.scrollIntoViewIfNeeded();
 
     for (let i = 1; i < 6; i++) {
-      await dataPage.clickPaginationPage(i.toString());
+      await dataTablesButtonsPage.clickPaginationPage(i.toString());
       // Bug 3 fix: replaced waitForTimeout(500) with deterministic waitForLoadState
-      await dataPage.page.waitForLoadState("domcontentloaded");
-      await expect(dataPage.page).toHaveURL(/Data-Table/i);
-      await dataPage.paginationSection.scrollIntoViewIfNeeded();
+      await dataTablesButtonsPage.page.waitForLoadState("domcontentloaded");
+      await expect(dataTablesButtonsPage.page).toHaveURL(/Data-Table/i);
+      await dataTablesButtonsPage.paginationSection.scrollIntoViewIfNeeded();
     }
 
-    await dataPage.clickPaginationPage(/»/);
-    await expect(dataPage.page).toHaveURL(/Data-Table/i);
-    await dataPage.paginationSection.scrollIntoViewIfNeeded();
+    await dataTablesButtonsPage.clickPaginationPage(/»/);
+    await expect(dataTablesButtonsPage.page).toHaveURL(/Data-Table/i);
+    await dataTablesButtonsPage.paginationSection.scrollIntoViewIfNeeded();
   });
 
   // Table
 
-  test("Table Section - Verify title and Table Values", async ({ page }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
-
-    await dataPage.tableSection.scrollIntoViewIfNeeded();
+  test("Table Section - Verify title and Table Values", async ({ dataTablesButtonsPage }) => {
+    await dataTablesButtonsPage.tableSection.scrollIntoViewIfNeeded();
 
     // Define section Items
-    const title = dataPage.tableSection.getByRole("heading", {
+    const title = dataTablesButtonsPage.tableSection.getByRole("heading", {
       name: "Table"
     });
 
-    const table = dataPage.tableSection
+    const table = dataTablesButtonsPage.tableSection
       .getByRole("table")
       .locator("th")
-      .or(dataPage.tableSection.locator("td"));
+      .or(dataTablesButtonsPage.tableSection.locator("td"));
 
     const tableValues = [
       "#",
@@ -304,33 +266,30 @@ test.describe("Data Tables and Buttons - Only Path", () => {
   // Button & States
 
   test("Button & States Section - Verify title and section Values", async ({
-    page
+    dataTablesButtonsPage
   }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
-
-    await dataPage.buttonStatesSection.scrollIntoViewIfNeeded();
+    await dataTablesButtonsPage.buttonStatesSection.scrollIntoViewIfNeeded();
 
     // Define section Items
-    const title = dataPage.buttonStatesSection.getByRole("heading", {
+    const title = dataTablesButtonsPage.buttonStatesSection.getByRole("heading", {
       name: "Buttons & States"
     });
 
-    const linkBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Link" });
-    const buttonBttn = dataPage.buttonStatesSection
+    const linkBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Link" });
+    const buttonBttn = dataTablesButtonsPage.buttonStatesSection
       .getByRole("button", { name: /Button/ })
       .first();
-    const inputBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Input" });
-    const submitBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Submit" });
-    const resetBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Reset" });
-    const dangerBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Danger" });
-    const warningBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Warning" });
-    const infoBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Info" });
-    const alertBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Alert" });
-    const button1Bttn = dataPage.buttonStatesSection.getByRole("button", { name: "Button-1" });
-    const button2Bttn = dataPage.buttonStatesSection.getByRole("button", { name: "Button-2" });
-    const button3Bttn = dataPage.buttonStatesSection.getByRole("button", { name: "Button-3" });
-    const button4Bttn = dataPage.buttonStatesSection.getByRole("button", { name: "Button-4" });
+    const inputBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Input" });
+    const submitBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Submit" });
+    const resetBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Reset" });
+    const dangerBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Danger" });
+    const warningBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Warning" });
+    const infoBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Info" });
+    const alertBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Alert" });
+    const button1Bttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Button-1" });
+    const button2Bttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Button-2" });
+    const button3Bttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Button-3" });
+    const button4Bttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Button-4" });
 
     // Verify elements exist and are visible
     await expect(title).toBeVisible();
@@ -351,30 +310,27 @@ test.describe("Data Tables and Buttons - Only Path", () => {
   });
 
   test("Button & States Section - Verify normal buttons click interactions work correctly", async ({
-    page
+    dataTablesButtonsPage
   }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
+    await dataTablesButtonsPage.buttonStatesSection.scrollIntoViewIfNeeded();
 
-    await dataPage.buttonStatesSection.scrollIntoViewIfNeeded();
-
-    const linkBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Link" });
-    const buttonBttn = dataPage.buttonStatesSection
+    const linkBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Link" });
+    const buttonBttn = dataTablesButtonsPage.buttonStatesSection
       .getByRole("button", { name: /Button/ })
       .first();
-    const inputBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Input" });
-    const submitBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Submit" });
-    const resetBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Reset" });
-    const dangerBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Danger" });
-    const warningBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Warning" });
-    const infoBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Info" });
-    const alertBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Alert" });
+    const inputBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Input" });
+    const submitBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Submit" });
+    const resetBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Reset" });
+    const dangerBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Danger" });
+    const warningBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Warning" });
+    const infoBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Info" });
+    const alertBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Alert" });
 
     await expect(linkBttn).toBeEnabled();
     await linkBttn.click();
-    await expect(dataPage.page).toHaveURL(/index.html#/i);
+    await expect(dataTablesButtonsPage.page).toHaveURL(/index.html#/i);
 
-    await dataPage.buttonStatesSection.scrollIntoViewIfNeeded();
+    await dataTablesButtonsPage.buttonStatesSection.scrollIntoViewIfNeeded();
 
     await expect(buttonBttn).toBeEnabled();
     await buttonBttn.click();
@@ -401,17 +357,14 @@ test.describe("Data Tables and Buttons - Only Path", () => {
   });
 
   test("Button & States Section - Verify enabled buttons click interactions work correctly", async ({
-    page
+    dataTablesButtonsPage
   }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
+    await dataTablesButtonsPage.buttonStatesSection.scrollIntoViewIfNeeded();
 
-    await dataPage.buttonStatesSection.scrollIntoViewIfNeeded();
-
-    const dangerBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Danger" });
-    const warningBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Warning" });
-    const infoBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Info" });
-    const alertBttn = dataPage.buttonStatesSection.getByRole("button", { name: "Alert" });
+    const dangerBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Danger" });
+    const warningBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Warning" });
+    const infoBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Info" });
+    const alertBttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Alert" });
 
     await expect(dangerBttn).not.toHaveClass(/disabled/);
     await dangerBttn.click();
@@ -426,17 +379,14 @@ test.describe("Data Tables and Buttons - Only Path", () => {
   });
 
   test("Button & States Section - Verify active buttons click interactions work correctly", async ({
-    page
+    dataTablesButtonsPage
   }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
+    await dataTablesButtonsPage.buttonStatesSection.scrollIntoViewIfNeeded();
 
-    await dataPage.buttonStatesSection.scrollIntoViewIfNeeded();
-
-    const button1Bttn = dataPage.buttonStatesSection.getByRole("button", { name: "Button-1" });
-    const button2Bttn = dataPage.buttonStatesSection.getByRole("button", { name: "Button-2" });
-    const button3Bttn = dataPage.buttonStatesSection.getByRole("button", { name: "Button-3" });
-    const button4Bttn = dataPage.buttonStatesSection.getByRole("button", { name: "Button-4" });
+    const button1Bttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Button-1" });
+    const button2Bttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Button-2" });
+    const button3Bttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Button-3" });
+    const button4Bttn = dataTablesButtonsPage.buttonStatesSection.getByRole("button", { name: "Button-4" });
 
     // Verify initial state
     await expect(button1Bttn).toHaveClass(/active/);
@@ -482,22 +432,19 @@ test.describe("Data Tables and Buttons - Only Path", () => {
   // Random Text
 
   test("Random Text Section - Verify title and texts are correct", async ({
-    page
+    dataTablesButtonsPage
   }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
-
-    await dataPage.randomTextSection.scrollIntoViewIfNeeded();
+    await dataTablesButtonsPage.randomTextSection.scrollIntoViewIfNeeded();
 
     // Define section items
-    const title = dataPage.randomTextSection.getByRole("heading", {
+    const title = dataTablesButtonsPage.randomTextSection.getByRole("heading", {
       name: "Random Text"
     });
 
-    const paragraph1 = dataPage.randomTextSection.getByRole("paragraph").first();
-    const paragraph2 = dataPage.randomTextSection.getByRole("paragraph").last();
+    const paragraph1 = dataTablesButtonsPage.randomTextSection.getByRole("paragraph").first();
+    const paragraph2 = dataTablesButtonsPage.randomTextSection.getByRole("paragraph").last();
 
-    const footerParagraph = dataPage.randomTextSection.locator("footer");
+    const footerParagraph = dataTablesButtonsPage.randomTextSection.locator("footer");
 
     // Verify texts and classes
     await expect(title).toBeVisible();
@@ -520,21 +467,18 @@ test.describe("Data Tables and Buttons - Only Path", () => {
   // Lists
 
   test("List Section - Verify section title and list values", async ({
-    page
+    dataTablesButtonsPage
   }) => {
-    const homePage = new HomePage(page);
-    const dataPage = await homePage.openDataTables();
-
-    await dataPage.listSection.scrollIntoViewIfNeeded();
+    await dataTablesButtonsPage.listSection.scrollIntoViewIfNeeded();
 
     // Define section items
-    const title = dataPage.listSection.getByRole("heading", {
+    const title = dataTablesButtonsPage.listSection.getByRole("heading", {
       name: "Lists"
     });
 
-    const coffeeList = dataPage.listSection.getByRole("list").first().locator("li");
-    const fruitsList = dataPage.listSection.getByRole("list").nth(1).locator("li");
-    const jobsList = dataPage.listSection.getByRole("list").nth(2).locator("li");
+    const coffeeList = dataTablesButtonsPage.listSection.getByRole("list").first().locator("li");
+    const fruitsList = dataTablesButtonsPage.listSection.getByRole("list").nth(1).locator("li");
+    const jobsList = dataTablesButtonsPage.listSection.getByRole("list").nth(2).locator("li");
 
     const expectedCoffeeList = ["Coffee", "Tea", "Milk", "Espresso", "Sugar"];
     const expectedFruitsList = [

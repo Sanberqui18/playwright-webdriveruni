@@ -1,132 +1,109 @@
-import { test, expect } from "@playwright/test";
-import { HomePage } from "../pages/home.page";
+import { test, expect } from "./fixtures";
 
 test.describe("Pop-Up & Aletrs - only Path", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
-
   test("Verify titles, sections and button visibility and texts", async ({
-    page
+    popupAlertsPage
   }) => {
-    const homePage = new HomePage(page);
-    const popupPage = await homePage.openPopupAlerts();
-
     // Validate Section QTY = 4 and title and footer
-    await expect(popupPage.pageNavTitle).toContainText(/WebdriverUniversity/i);
-    await expect(popupPage.mainTitle).toHaveText("Annoying Popup & Alerts!");
-    await expect(popupPage.sections).toHaveCount(4);
-    await expect(popupPage.footer).toContainText("Copyright");
+    await expect(popupAlertsPage.pageNavTitle).toContainText(/WebdriverUniversity/i);
+    await expect(popupAlertsPage.mainTitle).toHaveText("Annoying Popup & Alerts!");
+    await expect(popupAlertsPage.sections).toHaveCount(4);
+    await expect(popupAlertsPage.footer).toContainText("Copyright");
   });
 
   test("JavaScript Alert is opened when clicking on button and is working correctly", async ({
-    page
+    popupAlertsPage
   }) => {
-    const homePage = new HomePage(page);
-    const popupPage = await homePage.openPopupAlerts();
-
     //Define dialog event (alert) before clicking on the button
     //Grab alert message to assert afterwards
     let successMessage: string = "";
-    popupPage.page.on("dialog", async (dialog) => {
+    popupAlertsPage.page.on("dialog", async (dialog) => {
       successMessage = dialog.message();
       expect(successMessage).toContain("I am an alert box!");
       await dialog.accept();
     });
 
     // Click on button to open the alert
-    await popupPage.jsAlertButton.click();
+    await popupAlertsPage.jsAlertButton.click();
   });
 
   test("Modal Pop-up should appear when clicking on button and work correctly", async ({
-    page
+    popupAlertsPage
   }) => {
-    const homePage = new HomePage(page);
-    const popupPage = await homePage.openPopupAlerts();
-
     // Verify initial state (modal hidden)
-    await expect(popupPage.modal).toBeHidden();
+    await expect(popupAlertsPage.modal).toBeHidden();
 
     // Open modal and verify title and texts to exist and be visible
-    await popupPage.modalButton.click();
+    await popupAlertsPage.modalButton.click();
 
-    await expect(popupPage.modal).toBeVisible();
-    await expect(popupPage.modalTitle).toBeVisible();
-    await expect(popupPage.modalContent).toBeVisible();
+    await expect(popupAlertsPage.modal).toBeVisible();
+    await expect(popupAlertsPage.modalTitle).toBeVisible();
+    await expect(popupAlertsPage.modalContent).toBeVisible();
 
     // Verify close icon and button work correctly
-    await popupPage.modalCloseBtn.click();
-    await expect(popupPage.modal).toBeHidden();
+    await popupAlertsPage.modalCloseBtn.click();
+    await expect(popupAlertsPage.modal).toBeHidden();
 
-    await popupPage.modalButton.click();
+    await popupAlertsPage.modalButton.click();
 
-    await popupPage.modalCloseIcon.click();
-    await expect(popupPage.modal).toBeHidden();
+    await popupAlertsPage.modalCloseIcon.click();
+    await expect(popupAlertsPage.modal).toBeHidden();
   });
 
   test("Ajax Loader Page should be opened when clicking on the Ajax loader button", async ({
-    page
+    popupAlertsPage
   }) => {
-    const homePage = new HomePage(page);
-    const popupPage = await homePage.openPopupAlerts();
-
     // Click on button to open the ajax loader page
-    await popupPage.ajaxButton.click();
+    await popupAlertsPage.ajaxButton.click();
 
-    await expect(popupPage.page).toHaveURL(/Ajax-Loader/);
+    await expect(popupAlertsPage.page).toHaveURL(/Ajax-Loader/);
   });
 
   test("JavaScript Confirm Box (Accept) should be opened when clicking on button and work correcly", async ({
-    page
+    popupAlertsPage
   }) => {
-    const homePage = new HomePage(page);
-    const popupPage = await homePage.openPopupAlerts();
-
     //Define dialog event (alert) before clicking on the button
     let dialogMessage: string = "";
 
-    popupPage.page.on("dialog", async (dialog) => {
+    popupAlertsPage.page.on("dialog", async (dialog) => {
       dialogMessage = dialog.message();
       expect(dialogMessage).toContain("Press a button!");
       dialog.accept();
     });
 
     // Verify initial state
-    await expect(popupPage.confirmResultText).toBeHidden();
+    await expect(popupAlertsPage.confirmResultText).toBeHidden();
 
     // Click on the Confirm box button to open dialog
-    await popupPage.confirmButton.click();
-    await popupPage.page.waitForLoadState();
+    await popupAlertsPage.confirmButton.click();
+    await popupAlertsPage.page.waitForLoadState();
 
     //Verify Section message is shown and correct
-    await expect(popupPage.confirmResultText).toBeVisible();
-    await expect(popupPage.confirmResultText).toHaveText("You pressed OK!");
+    await expect(popupAlertsPage.confirmResultText).toBeVisible();
+    await expect(popupAlertsPage.confirmResultText).toHaveText("You pressed OK!");
   });
 
   test("JavaScript Confirm Box (Dismiss) should be opened when clicking on button and work correcly", async ({
-    page
+    popupAlertsPage
   }) => {
-    const homePage = new HomePage(page);
-    const popupPage = await homePage.openPopupAlerts();
-
     //Define dialog event (alert) before clicking on the button
     let dialogMessage: string = "";
 
-    popupPage.page.on("dialog", async (dialog) => {
+    popupAlertsPage.page.on("dialog", async (dialog) => {
       dialogMessage = dialog.message();
       expect(dialogMessage).toContain("Press a button!");
       dialog.dismiss();
     });
 
     // Verify initial state
-    await expect(popupPage.confirmResultText).toBeHidden();
+    await expect(popupAlertsPage.confirmResultText).toBeHidden();
 
     // Click on the Confirm box button to open dialog
-    await popupPage.confirmButton.click();
-    await popupPage.page.waitForLoadState();
+    await popupAlertsPage.confirmButton.click();
+    await popupAlertsPage.page.waitForLoadState();
 
     //Verify Section message is shown and correct
-    await expect(popupPage.confirmResultText).toBeVisible();
-    await expect(popupPage.confirmResultText).toHaveText("You pressed Cancel!");
+    await expect(popupAlertsPage.confirmResultText).toBeVisible();
+    await expect(popupAlertsPage.confirmResultText).toHaveText("You pressed Cancel!");
   });
 });

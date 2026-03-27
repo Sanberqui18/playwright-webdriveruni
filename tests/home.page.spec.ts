@@ -1,23 +1,14 @@
-import { test, expect } from "@playwright/test";
-import { HomePage } from "../pages/home.page";
+import { test, expect } from "./fixtures";
 
 test.describe("Home Page Tests - Only Path", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
-
-  test("Verify Home Page Header", async ({ page }) => {
-    const homePage = new HomePage(page);
-
+  test("Verify Home Page Header", async ({ homePage }) => {
     // Verify Header title and redirection
     await expect(homePage.navTitle).toContainText(/WebdriverUniversity.com/);
     await homePage.navTitle.click();
-    expect(page.url()).toContain("https://webdriveruniversity.com");
+    expect(homePage.page.url()).toContain("https://webdriveruniversity.com");
   });
 
-  test("Verify Discount, and Course Text/Links", async ({ page }) => {
-    const homePage = new HomePage(page);
-
+  test("Verify Discount, and Course Text/Links", async ({ homePage }) => {
     // Set expected outputs
     const titlesAndURLs = [
       {
@@ -73,14 +64,12 @@ test.describe("Home Page Tests - Only Path", () => {
 
       expect(linkTitles[key]).toBe(value.title);
       await homePage.courseLinks.nth(key).click();
-      expect(page.url()).toContain(value.url);
-      await page.goBack();
+      expect(homePage.page.url()).toContain(value.url);
+      await homePage.page.goBack();
     }
   });
 
-  test("Verify Home Section Quantities and Texts", async ({ page }) => {
-    const homePage = new HomePage(page);
-
+  test("Verify Home Section Quantities and Texts", async ({ homePage }) => {
     // Set expected sections
     const expectedSections = [
       "CONTACT US",
