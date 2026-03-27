@@ -1,25 +1,17 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import { faker } from "@faker-js/faker";
-import { HomePage } from "../pages/home.page";
 
 test.describe("Login Portal Tests - Happy Path", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
-
   test("Log in with valid credentials should show an alert success message", async ({
-    page
+    loginPortalPage
   }) => {
-    const homePage = new HomePage(page);
-    const loginPage = await homePage.openLoginPortal();
-
     // Verify page URL to contain the login portal
-    await expect(loginPage.page).toHaveURL(/login-portal/i);
+    await expect(loginPortalPage.page).toHaveURL(/login-portal/i);
 
     //Define dialog event (alert) before clicking on the button
     //Grab alert message to assert afterwards
     let successMessage: string = "";
-    loginPage.page.on("dialog", async (dialog) => {
+    loginPortalPage.page.on("dialog", async (dialog) => {
       // Grab allert message
       successMessage = dialog.message();
 
@@ -29,80 +21,67 @@ test.describe("Login Portal Tests - Happy Path", () => {
     });
 
     // Fill out the details and submit form (will fire then on() event)
-    await loginPage.login(
+    await loginPortalPage.login(
       process.env.USERNAME as string,
       process.env.PASSWORD as string
     );
   });
 
   test("Login Page Animation should contain 10 animation bubbles", async ({
-    page
+    loginPortalPage
   }) => {
-    const homePage = new HomePage(page);
-    const loginPage = await homePage.openLoginPortal();
-
-    await expect(loginPage.animationBubbles).toHaveCount(10);
+    await expect(loginPortalPage.animationBubbles).toHaveCount(10);
   });
 });
 
 test.describe("Login Portal Tests - Unhappy Path", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
-
   test("Submit empty/incomplete form should show an alert error message", async ({
-    page
+    loginPortalPage
   }) => {
-    const homePage = new HomePage(page);
-    const loginPage = await homePage.openLoginPortal();
-
     // Define dialog event (alert) before clicking on the button
     // Grab alert message to assert afterwards
     // Called every time an alert is opened
     let errorMessage: string = "";
 
-    loginPage.page.on("dialog", async (dialog) => {
+    loginPortalPage.page.on("dialog", async (dialog) => {
       errorMessage = dialog.message();
       expect(errorMessage).toContain("validation failed");
       await dialog.accept();
     });
 
     // Fill username and submit
-    await loginPage.usernameField.fill(process.env.USERNAME as string);
-    await loginPage.loginButton.click();
+    await loginPortalPage.usernameField.fill(process.env.USERNAME as string);
+    await loginPortalPage.loginButton.click();
 
     // Wait page to load after closing alert
-    await loginPage.page.waitForLoadState();
+    await loginPortalPage.page.waitForLoadState();
 
     // Fill password and submit
-    await loginPage.passwordField.fill(process.env.PASSWORD as string);
-    await loginPage.loginButton.click();
+    await loginPortalPage.passwordField.fill(process.env.PASSWORD as string);
+    await loginPortalPage.loginButton.click();
 
     // Wait page to load after closing alert
-    await loginPage.page.waitForLoadState();
+    await loginPortalPage.page.waitForLoadState();
 
     // Submit empty form
-    await loginPage.loginButton.click();
+    await loginPortalPage.loginButton.click();
   });
 
   test("Submit invalid credentials should show an alert error message", async ({
-    page
+    loginPortalPage
   }) => {
-    const homePage = new HomePage(page);
-    const loginPage = await homePage.openLoginPortal();
-
     // Define dialog event (alert) before clicking on the button
     // Grab alert message to assert afterwards
     let errorMessage: string = "";
 
-    loginPage.page.on("dialog", async (dialog) => {
+    loginPortalPage.page.on("dialog", async (dialog) => {
       errorMessage = dialog.message();
       expect(errorMessage).toContain("validation failed");
       await dialog.accept();
     });
 
     // Fill out the details and submit form (will fire then on() event)
-    await loginPage.login(
+    await loginPortalPage.login(
       faker.person.firstName(),
       faker.person.jobArea()
     );

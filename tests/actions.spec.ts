@@ -1,17 +1,9 @@
-import { test, expect } from "@playwright/test";
-import { HomePage } from "../pages/home.page";
+import { test, expect } from "./fixtures";
 
 test.describe("Actions - Happy Path", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
-
   test("Verify Page URL, Header, Title, Sections and Footer", async ({
-    page
+    actionsPage
   }) => {
-    const homePage = new HomePage(page);
-    const actionsPage = await homePage.openActions();
-
     // Verify url and Header title
     await expect(actionsPage.page).toHaveURL(/Actions/i);
     await expect(actionsPage.pageNavTitle).toContainText(/WebdriverUniversity.com/);
@@ -27,10 +19,7 @@ test.describe("Actions - Happy Path", () => {
     await expect(actionsPage.footer).toContainText("Copyright");
   });
 
-  test("Drag and Drop section should work correctly", async ({ page }) => {
-    const homePage = new HomePage(page);
-    const actionsPage = await homePage.openActions();
-
+  test("Drag and Drop section should work correctly", async ({ actionsPage }) => {
     // Define drag and drop elements
     const dragDropSection = actionsPage.dragDropSectionFirst;
     const draggable = actionsPage.draggable(dragDropSection);
@@ -83,10 +72,7 @@ test.describe("Actions - Happy Path", () => {
     await expect(droppable).toContainText("Dropped!");
   });
 
-  test("Double Click section should work correctly", async ({ page }) => {
-    const homePage = new HomePage(page);
-    const actionsPage = await homePage.openActions();
-
+  test("Double Click section should work correctly", async ({ actionsPage }) => {
     const dblClickBttn = actionsPage.doubleClickButton;
 
     // Verify inital state
@@ -102,10 +88,7 @@ test.describe("Actions - Happy Path", () => {
     await expect(dblClickBttn).toHaveClass("div-double-click");
   });
 
-  test("Hover Over section should work correctly", async ({ page }) => {
-    const homePage = new HomePage(page);
-    const actionsPage = await homePage.openActions();
-
+  test("Hover Over section should work correctly", async ({ actionsPage }) => {
     const hoverFirst = actionsPage.hoverButtons.nth(0);
     const hoverSecond = actionsPage.hoverButtons.nth(1);
     const hoverThird = actionsPage.hoverButtons.nth(2);
@@ -164,10 +147,7 @@ test.describe("Actions - Happy Path", () => {
     await fourthAlert.click();
   });
 
-  test("Click and Hold section should work correclty", async ({ page }) => {
-    const homePage = new HomePage(page);
-    const actionsPage = await homePage.openActions();
-
+  test("Click and Hold section should work correclty", async ({ actionsPage }) => {
     const clickAndHoldBttn = actionsPage.clickAndHoldBox;
 
     // Verify Initial State
@@ -195,16 +175,9 @@ test.describe("Actions - Happy Path", () => {
 });
 
 test.describe("Actions - Edge Path", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
-
   test("Drag and Drop section - Releasing drag outside the drop secion should not change the color", async ({
-    page
+    actionsPage
   }) => {
-    const homePage = new HomePage(page);
-    const actionsPage = await homePage.openActions();
-
     const dragDropSection = actionsPage.dragDropSectionFirst;
     const draggable = actionsPage.draggable(dragDropSection);
     const droppable = actionsPage.droppable(dragDropSection);
@@ -222,11 +195,8 @@ test.describe("Actions - Edge Path", () => {
   });
 
   test("Double Click section - Clicking once should not change click color", async ({
-    page
+    actionsPage
   }) => {
-    const homePage = new HomePage(page);
-    const actionsPage = await homePage.openActions();
-
     const dblClickBttn = actionsPage.doubleClickButton;
 
     // Perform just one click and verify the color does not change

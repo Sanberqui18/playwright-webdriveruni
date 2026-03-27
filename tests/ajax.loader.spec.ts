@@ -1,78 +1,64 @@
-import { test, expect } from "@playwright/test";
-import { HomePage } from "../pages/home.page";
+import { test, expect } from "./fixtures";
 
 test.describe("Ajax Loader - Only Path", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
-
-  test("Verify URL and header", async ({ page }) => {
-    const homePage = new HomePage(page);
-    const ajaxPage = await homePage.openAjaxLoader();
-
+  test("Verify URL and header", async ({ ajaxLoaderPage }) => {
     // Verify url and Header title
-    await expect(ajaxPage.page).toHaveURL(/Ajax-Loader/i);
-    await expect(ajaxPage.navTitle).toContainText(/WebdriverUniversity.com/);
+    await expect(ajaxLoaderPage.page).toHaveURL(/Ajax-Loader/i);
+    await expect(ajaxLoaderPage.navTitle).toContainText(/WebdriverUniversity.com/);
   });
 
   test("Verify Ajax loader is visible then button appears", async ({
-    page
+    ajaxLoaderPage
   }) => {
-    const homePage = new HomePage(page);
-    const ajaxPage = await homePage.openAjaxLoader();
-
     // Verify initial state loader visible button not visible
-    await expect(ajaxPage.loader).toBeVisible();
-    await expect(ajaxPage.loader).not.toHaveCSS("display", "none");
+    await expect(ajaxLoaderPage.loader).toBeVisible();
+    await expect(ajaxLoaderPage.loader).not.toHaveCSS("display", "none");
 
-    await expect(ajaxPage.clickButton).toBeHidden();
-    await expect(ajaxPage.buttonContainer).not.toHaveCSS("display", "block");
+    await expect(ajaxLoaderPage.clickButton).toBeHidden();
+    await expect(ajaxLoaderPage.buttonContainer).not.toHaveCSS("display", "block");
 
     // Wait until the loader disappears
-    await ajaxPage.waitForLoaderToHide();
+    await ajaxLoaderPage.waitForLoaderToHide();
 
     // Verify button visible and loader not visible
-    await expect(ajaxPage.loader).toHaveCSS("display", "none");
+    await expect(ajaxLoaderPage.loader).toHaveCSS("display", "none");
 
-    await expect(ajaxPage.clickButton).toBeVisible();
-    await expect(ajaxPage.buttonContainer).toHaveCSS("display", "block");
+    await expect(ajaxLoaderPage.clickButton).toBeVisible();
+    await expect(ajaxLoaderPage.buttonContainer).toHaveCSS("display", "block");
 
-    await expect(ajaxPage.clickButton).toHaveText("CLICK ME!");
+    await expect(ajaxLoaderPage.clickButton).toHaveText("CLICK ME!");
   });
 
   test("Button when ajax loader disappears works correcly", async ({
-    page
+    ajaxLoaderPage
   }) => {
-    const homePage = new HomePage(page);
-    const ajaxPage = await homePage.openAjaxLoader();
-
     // Wait until the loader disappears
-    await ajaxPage.waitForLoaderToHide();
+    await ajaxLoaderPage.waitForLoaderToHide();
 
-    const clickBttn = ajaxPage.buttonContainer
+    const clickBttn = ajaxLoaderPage.buttonContainer
       .getByRole("paragraph")
       .filter({ hasText: "Click me!" });
 
     // Verify modal is not visible before clicking on button
-    await expect(ajaxPage.modal).toBeHidden();
+    await expect(ajaxLoaderPage.modal).toBeHidden();
 
     // Open modal and verify it is visible
     await clickBttn.click();
-    await expect(ajaxPage.modal).toBeVisible();
+    await expect(ajaxLoaderPage.modal).toBeVisible();
 
     // Verify modal text
-    await expect(ajaxPage.modalTitle).toHaveText("Well Done For Waiting....!!!");
-    await expect(ajaxPage.modalContent).toContainText(
+    await expect(ajaxLoaderPage.modalTitle).toHaveText("Well Done For Waiting....!!!");
+    await expect(ajaxLoaderPage.modalContent).toContainText(
       "The waiting game can be a tricky one;"
     );
 
     // verify modal actions
-    await ajaxPage.modalCloseBtn.click();
-    await expect(ajaxPage.modal).toBeHidden();
+    await ajaxLoaderPage.modalCloseBtn.click();
+    await expect(ajaxLoaderPage.modal).toBeHidden();
 
     await clickBttn.click();
 
-    await ajaxPage.modalXButton.click();
-    await expect(ajaxPage.modal).toBeHidden();
+    await ajaxLoaderPage.modalXButton.click();
+    await expect(ajaxLoaderPage.modal).toBeHidden();
   });
 });

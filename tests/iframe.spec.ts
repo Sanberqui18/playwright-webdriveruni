@@ -1,19 +1,11 @@
 /* eslint-disable playwright/no-conditional-expect */
 /* eslint-disable playwright/no-conditional-in-test */
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import { faker } from "@faker-js/faker";
-import { HomePage } from "../pages/home.page";
 
 test.describe("Iframe - Only Path", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
-
   test.describe("IFrame Page", () => {
-    test("Verify URL, frame existance and footer", async ({ page }) => {
-      const homePage = new HomePage(page);
-      const iframePage = await homePage.openIFrame();
-
+    test("Verify URL, frame existance and footer", async ({ iframePage }) => {
       // Verify page URL
       await expect(iframePage.page).toHaveURL(/IFrame/i);
 
@@ -35,10 +27,7 @@ test.describe("Iframe - Only Path", () => {
         }
       });
 
-      test("Verify Section Navigation", async ({ page }) => {
-        const homePage = new HomePage(page);
-        const iframePage = await homePage.openIFrame();
-
+      test("Verify Section Navigation", async ({ iframePage }) => {
         // Verify initial state
         await expect(iframePage.homeSection).toBeVisible();
         await expect(iframePage.productSection).not.toBeAttached();
@@ -59,10 +48,7 @@ test.describe("Iframe - Only Path", () => {
         await expect(iframePage.contactTitle).toBeVisible();
       });
 
-      test("Image Container list should work correctly", async ({ page }) => {
-        const homePage = new HomePage(page);
-        const iframePage = await homePage.openIFrame();
-
+      test("Image Container list should work correctly", async ({ iframePage }) => {
         // Verify Image Slides and Selection count
         await expect(iframePage.imageSlides).toHaveCount(3);
         await expect(iframePage.imageDots).toHaveCount(3);
@@ -91,11 +77,8 @@ test.describe("Iframe - Only Path", () => {
       });
 
       test("Image Container buttons should work correctly", async ({
-        page
+        iframePage
       }) => {
-        const homePage = new HomePage(page);
-        const iframePage = await homePage.openIFrame();
-
         await expect(iframePage.imageSlides).toHaveCount(3);
 
         await expect(iframePage.imageSlides.nth(0)).toHaveClass("item active");
@@ -124,11 +107,8 @@ test.describe("Iframe - Only Path", () => {
       });
 
       test("Verify Section Qty, titles, stars, buttons and texts", async ({
-        page
+        iframePage
       }) => {
-        const homePage = new HomePage(page);
-        const iframePage = await homePage.openIFrame();
-
         // Define menu values
         const menuValues = ["Home", "Our Products", "Contact Us"];
 
@@ -179,10 +159,7 @@ test.describe("Iframe - Only Path", () => {
         }
       });
 
-      test("Verify modal contents and buttons", async ({ page }) => {
-        const homePage = new HomePage(page);
-        const iframePage = await homePage.openIFrame();
-
+      test("Verify modal contents and buttons", async ({ iframePage }) => {
         await iframePage.findOutMoreBtn.click();
 
         await expect(iframePage.homeModal).toBeVisible();
@@ -209,20 +186,14 @@ test.describe("Iframe - Only Path", () => {
   });
 
   test.describe("IFrame - Our Products", () => {
-    test("Verify Header", async ({ page }) => {
-      const homePage = new HomePage(page);
-      const iframePage = await homePage.openIFrame();
-
+    test("Verify Header", async ({ iframePage }) => {
       await iframePage.productsTab.click();
 
       // Verify page header
       await expect(iframePage.productHeaderTitle).toContainText(/WebDriver/);
     });
 
-    test("Verify Section Navigations", async ({ page }) => {
-      const homePage = new HomePage(page);
-      const iframePage = await homePage.openIFrame();
-
+    test("Verify Section Navigations", async ({ iframePage }) => {
       // Open contact section
       await iframePage.productsTab.click();
 
@@ -246,10 +217,7 @@ test.describe("Iframe - Only Path", () => {
       await expect(iframePage.contactTitle).toBeVisible();
     });
 
-    test("Verify Product Sections and modals", async ({ page }) => {
-      const homePage = new HomePage(page);
-      const iframePage = await homePage.openIFrame();
-
+    test("Verify Product Sections and modals", async ({ iframePage }) => {
       await iframePage.productsTab.click();
 
       // Verify Product Section QTY = 8
@@ -295,19 +263,13 @@ test.describe("Iframe - Only Path", () => {
 
   test.describe("IFrame - Contact Us", () => {
     test.describe("IFrame - Contact Us - Happy Path", () => {
-      test("Verify Contact US Page Header", async ({ page }) => {
-        const homePage = new HomePage(page);
-        const iframePage = await homePage.openIFrame();
-
+      test("Verify Contact US Page Header", async ({ iframePage }) => {
         // Verify Header Title exists (displayed on home tab by default)
         const headerTitle = iframePage.frame.locator("#nav-title");
         await expect(headerTitle).toContainText(/WebdriverUniversity.com/);
       });
 
-      test("Submit Form with all fields should work", async ({ page }) => {
-        const homePage = new HomePage(page);
-        const iframePage = await homePage.openIFrame();
-
+      test("Submit Form with all fields should work", async ({ iframePage }) => {
         await iframePage.contactTab.click();
 
         // Fill all Fields
@@ -329,10 +291,7 @@ test.describe("Iframe - Only Path", () => {
         await expect(iframePage.contactAnimationDots).toHaveCount(8);
       });
 
-      test("Reset form field should blank all of them", async ({ page }) => {
-        const homePage = new HomePage(page);
-        const iframePage = await homePage.openIFrame();
-
+      test("Reset form field should blank all of them", async ({ iframePage }) => {
         await iframePage.contactTab.click();
 
         // Fill all Fields
@@ -355,11 +314,8 @@ test.describe("Iframe - Only Path", () => {
 
     test.describe("IFrame - Contact Us - Unhappy Path", () => {
       test("Submit Form without Filling any data should show an error", async ({
-        page
+        iframePage
       }) => {
-        const homePage = new HomePage(page);
-        const iframePage = await homePage.openIFrame();
-
         await iframePage.contactTab.click();
 
         // Submit empty form
@@ -372,11 +328,8 @@ test.describe("Iframe - Only Path", () => {
       });
 
       test("Submit form without any field should show an error", async ({
-        page
+        iframePage
       }) => {
-        const homePage = new HomePage(page);
-        const iframePage = await homePage.openIFrame();
-
         await iframePage.contactTab.click();
 
         // Fill First Name
@@ -436,11 +389,8 @@ test.describe("Iframe - Only Path", () => {
       });
 
       test("Submit all data without a valid email should show the email error", async ({
-        page
+        iframePage
       }) => {
-        const homePage = new HomePage(page);
-        const iframePage = await homePage.openIFrame();
-
         await iframePage.contactTab.click();
 
         // Fill all Fields (Invalid Email)
