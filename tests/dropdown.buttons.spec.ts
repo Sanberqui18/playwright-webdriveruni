@@ -1,20 +1,12 @@
-import { test, expect } from "@playwright/test";
-import { HomePage } from "../pages/home.page";
+import { test, expect } from "./fixtures";
 
 test.describe("Dropdown, Checkboxes & Radio Buttons - Only Path", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
-
-  test("Verify Page Header, Title, sections and footer", async ({ page }) => {
-    const homePage = new HomePage(page);
-    const bttnsPage = await homePage.openDropdownButtons();
-
+  test("Verify Page Header, Title, sections and footer", async ({ dropdownButtonsPage }) => {
     // Verify Header Title exists
-    await expect(bttnsPage.navTitle).toContainText(/WebdriverUniversity.com/);
+    await expect(dropdownButtonsPage.navTitle).toContainText(/WebdriverUniversity.com/);
 
     // Verify title
-    const title = bttnsPage.page.locator("#main-header");
+    const title = dropdownButtonsPage.page.locator("#main-header");
 
     await expect(title).toContainText(
       "Dropdown Menu(s), Checkboxe(s) & Radio Button(s)"
@@ -22,7 +14,7 @@ test.describe("Dropdown, Checkboxes & Radio Buttons - Only Path", () => {
     await expect(title).toBeVisible();
 
     // Verify section QTY = 4 and titles
-    await expect(bttnsPage.sections).toHaveCount(4);
+    await expect(dropdownButtonsPage.sections).toHaveCount(4);
 
     const sectionTitles = [
       "Dropdown Menu(s)",
@@ -32,29 +24,26 @@ test.describe("Dropdown, Checkboxes & Radio Buttons - Only Path", () => {
     ];
 
     for (const titleValue of sectionTitles) {
-      const sectionTitle = bttnsPage.sections.getByRole("heading");
+      const sectionTitle = dropdownButtonsPage.sections.getByRole("heading");
       await expect(
         sectionTitle.nth(sectionTitles.indexOf(titleValue))
       ).toHaveText(titleValue);
     }
 
-    await expect(bttnsPage.footer).toContainText("Copyright");
-    await expect(bttnsPage.footer).toBeVisible();
+    await expect(dropdownButtonsPage.footer).toContainText("Copyright");
+    await expect(dropdownButtonsPage.footer).toBeVisible();
   });
 
   test("Dropdown Manu(s) values are correct and work correclty", async ({
-    page
+    dropdownButtonsPage
   }) => {
-    const homePage = new HomePage(page);
-    const bttnsPage = await homePage.openDropdownButtons();
-
     // Validate dropdown QTY = 3
-    await expect(bttnsPage.dropdowns).toHaveCount(3);
+    await expect(dropdownButtonsPage.dropdowns).toHaveCount(3);
 
     // Define test dropdowns and their data
-    const dropdown1 = bttnsPage.dropdowns.nth(0);
-    const dropdown2 = bttnsPage.dropdowns.nth(1);
-    const dropdown3 = bttnsPage.dropdowns.nth(2);
+    const dropdown1 = dropdownButtonsPage.dropdowns.nth(0);
+    const dropdown2 = dropdownButtonsPage.dropdowns.nth(1);
+    const dropdown3 = dropdownButtonsPage.dropdowns.nth(2);
 
     const values1 = ["JAVA", "C#", "Python", "SQL"];
     const values2 = ["Eclipse", "Maven", "TestNG", "JUnit"];
@@ -137,19 +126,16 @@ test.describe("Dropdown, Checkboxes & Radio Buttons - Only Path", () => {
   });
 
   test("Checkboxe(s)values are correct and work correclty", async ({
-    page
+    dropdownButtonsPage
   }) => {
-    const homePage = new HomePage(page);
-    const bttnsPage = await homePage.openDropdownButtons();
-
     // Validate checkboxes QTY = 4
-    await expect(bttnsPage.checkboxes).toHaveCount(4);
+    await expect(dropdownButtonsPage.checkboxes).toHaveCount(4);
 
     // Define test checkboxes and verify their data
-    const checkbox1 = bttnsPage.checkboxes.nth(0);
-    const checkbox2 = bttnsPage.checkboxes.nth(1);
-    const checkbox3 = bttnsPage.checkboxes.nth(2);
-    const checkbox4 = bttnsPage.checkboxes.nth(3);
+    const checkbox1 = dropdownButtonsPage.checkboxes.nth(0);
+    const checkbox2 = dropdownButtonsPage.checkboxes.nth(1);
+    const checkbox3 = dropdownButtonsPage.checkboxes.nth(2);
+    const checkbox4 = dropdownButtonsPage.checkboxes.nth(3);
 
     await expect(checkbox1).toHaveValue(/Option-1/i);
     await expect(checkbox2).toHaveValue(/Option-2/i);
@@ -184,19 +170,16 @@ test.describe("Dropdown, Checkboxes & Radio Buttons - Only Path", () => {
     await expect(checkbox4).not.toBeChecked();
   });
 
-  test("Radio Button(s) are correct and work correclty", async ({ page }) => {
-    const homePage = new HomePage(page);
-    const bttnsPage = await homePage.openDropdownButtons();
-
+  test("Radio Button(s) are correct and work correclty", async ({ dropdownButtonsPage }) => {
     // Validate radio buttons QTY = 5
-    await expect(bttnsPage.radioButtons).toHaveCount(5);
+    await expect(dropdownButtonsPage.radioButtons).toHaveCount(5);
 
     // Define test radio buttons and verify their data
-    const radioButton1 = bttnsPage.radioButtons.nth(0);
-    const radioButton2 = bttnsPage.radioButtons.nth(1);
-    const radioButton3 = bttnsPage.radioButtons.nth(2);
-    const radioButton4 = bttnsPage.radioButtons.nth(3);
-    const radioButton5 = bttnsPage.radioButtons.nth(4);
+    const radioButton1 = dropdownButtonsPage.radioButtons.nth(0);
+    const radioButton2 = dropdownButtonsPage.radioButtons.nth(1);
+    const radioButton3 = dropdownButtonsPage.radioButtons.nth(2);
+    const radioButton4 = dropdownButtonsPage.radioButtons.nth(3);
+    const radioButton5 = dropdownButtonsPage.radioButtons.nth(4);
 
     await expect(radioButton1).toHaveValue("green");
     await expect(radioButton2).toHaveValue("blue");
@@ -254,13 +237,10 @@ test.describe("Dropdown, Checkboxes & Radio Buttons - Only Path", () => {
   });
 
   test("Selected & Disabled are correct and work correclty", async ({
-    page
+    dropdownButtonsPage
   }) => {
-    const homePage = new HomePage(page);
-    const bttnsPage = await homePage.openDropdownButtons();
-
-    const radioButtons = bttnsPage.selectedDisabledRadioButtons;
-    const dropdown = bttnsPage.selectedDisabledDropdown;
+    const radioButtons = dropdownButtonsPage.selectedDisabledRadioButtons;
+    const dropdown = dropdownButtonsPage.selectedDisabledDropdown;
 
     // Verify radio and dropdown QTYs
     await expect(radioButtons).toHaveCount(3);

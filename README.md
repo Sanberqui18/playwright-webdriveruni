@@ -1,21 +1,19 @@
 # playwright-webdriveruni
 
-![E2E Tests](https://github.com/SantiagoBernal/playwright-webdriveruni/actions/workflows/e2e.yml/badge.svg)
-
 An end-to-end test automation suite for [WebdriverUniversity.com](https://webdriveruniversity.com), built with **Playwright**, **TypeScript**, and **GitHub Actions**.
 
 ---
 
 ## Overview
 
-This project automates UI testing across the full range of interactive features offered by WebdriverUniversity — a dedicated practice site for web automation engineers. It covers 17 test scenarios including form handling, iFrames, drag-and-drop, file uploads, login flows, popups, data tables, and more.
+This project automates UI testing across the full range of interactive features offered by WebdriverUniversity, a dedicated practice site for web automation engineers. It covers 17 test scenarios including form handling, iFrames, drag-and-drop, file uploads, login flows, popups, data tables, and more.
 
 **Tech Stack:**
-- [Playwright](https://playwright.dev/) `^1.43.1` — E2E test framework
-- TypeScript — type-safe test authoring
-- [@faker-js/faker](https://fakerjs.dev/) — dynamic test data generation
-- [dotenv](https://github.com/motdotla/dotenv) — environment variable management
-- GitHub Actions — CI/CD pipeline with sharded parallel execution
+- [Playwright](https://playwright.dev/) `^1.43.1`, E2E test framework
+- TypeScript, type-safe test authoring
+- [@faker-js/faker](https://fakerjs.dev/), dynamic test data generation
+- [dotenv](https://github.com/motdotla/dotenv), environment variable management
+- GitHub Actions, CI/CD pipeline with sharded parallel execution
 
 ---
 
@@ -31,6 +29,8 @@ playwright-webdriveruni/
 │   ├── base.page.ts                 # Abstract base class
 │   └── *.page.ts                    # One POM per feature
 ├── tests/                           # Test specs (17 files)
+│   ├── fixtures/
+│   │   └── index.ts                 # Custom Playwright fixtures
 │   └── *.spec.ts
 ├── snapshots/                       # Visual regression baselines
 ├── test-results/                    # Local test output (gitignored)
@@ -61,7 +61,72 @@ tests/actions.spec.ts        <-->  pages/actions.page.ts
 ...
 ```
 
-This means selectors live only in page objects — never directly in tests.
+This means selectors live only in page objects, never directly in tests.
+
+---
+
+## Custom Fixtures
+
+All tests import `test` and `expect` from `tests/fixtures/index.ts` instead of directly from `@playwright/test`. This single file uses Playwright's `test.extend()` API to provide a ready-to-use page object for every feature, eliminating the repetitive `beforeEach` navigation and manual page construction that would otherwise appear in every test.
+
+**Before fixtures:**
+```typescript
+import { test, expect } from "@playwright/test";
+import { HomePage } from "../pages/home.page";
+
+test.describe("Login Portal Tests", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+  });
+
+  test("should log in successfully", async ({ page }) => {
+    const homePage = new HomePage(page);
+    const loginPage = await homePage.openLoginPortal();
+    await loginPage.login(process.env.USERNAME, process.env.PASSWORD);
+  });
+});
+```
+
+**After fixtures:**
+```typescript
+import { test, expect } from "./fixtures";
+
+test.describe("Login Portal Tests", () => {
+  test("should log in successfully", async ({ loginPortalPage }) => {
+    await loginPortalPage.login(process.env.USERNAME, process.env.PASSWORD);
+  });
+});
+```
+
+Each fixture navigates to the home page, opens the correct popup, and returns a fully constructed page object, scoped per test for complete isolation.
+
+### Available Fixtures
+
+| Fixture | Page Opened |
+|---|---|
+| `homePage` | Home page (no popup) |
+| `loginPortalPage` | Login Portal |
+| `contactUsPage` | Contact Us |
+| `clickButtonsPage` | Button Clicks |
+| `toDoListPage` | To Do List |
+| `pageObjectModelPage` | Page Object Model |
+| `textAffectsPage` | Accordion & Text Affects |
+| `dropdownButtonsPage` | Dropdown, Checkboxes & Radio Buttons |
+| `ajaxLoaderPage` | Ajax Loader |
+| `actionsPage` | Actions (drag & drop, hover, etc.) |
+| `scrollingAroundPage` | Scrolling Around |
+| `popupAlertsPage` | Popup & Alerts |
+| `iframePage` | IFrame |
+| `hiddenElementsPage` | Hidden Elements |
+| `dataTablesButtonsPage` | Data, Tables & Button States |
+| `autocompleteTextPage` | Autocomplete Textfield |
+| `fileUploadPage` | File Upload |
+
+### Adding a New Fixture
+
+1. Add the new page type to the `AppFixtures` type in [tests/fixtures/index.ts](tests/fixtures/index.ts)
+2. Add the fixture implementation calling the corresponding `homePage.open*()` method
+3. Import the new fixture in your spec: `import { test, expect } from "./fixtures";`
 
 ---
 
@@ -180,7 +245,7 @@ Only **Chromium** is enabled. Firefox and WebKit projects exist in the config bu
 
 ## CI/CD Pipeline
 
-### `e2e.yml` — Main E2E Tests
+### `e2e.yml`, Main E2E Tests
 
 **Triggers:** Push to `main`, pull requests targeting `main`
 
@@ -211,9 +276,9 @@ Shard 4/4  ──┘
 
 ---
 
-### `update-snapshots.yml` — Visual Snapshot Updates
+### `update-snapshots.yml`, Visual Snapshot Updates
 
-**Trigger:** Manual (`workflow_dispatch`) — select the target branch
+**Trigger:** Manual (`workflow_dispatch`), select the target branch
 
 **What it does:**
 1. Checks out the specified branch
